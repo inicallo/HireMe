@@ -1,7 +1,8 @@
 import App from './app';
+import { connectDB } from './utils/connectDB';
 
 const main = () => {
-  // init db here
+  connectDB();
 
   const app = new App();
   app.start();

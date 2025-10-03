@@ -1,3 +1,5 @@
+// api/src/app.ts
+
 import express, {
   json,
   urlencoded,
@@ -113,4 +115,12 @@ export default class App {
       console.log(`  ➜  [API] Local:   http://localhost:${PORT}/api`);
     });
   }
+  
+  public getApp(): Express {
+    return this.app;
+  }
 }
+
+const appInstance = new App().getApp();
+
+export { appInstance };

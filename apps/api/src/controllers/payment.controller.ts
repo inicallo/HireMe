@@ -1,7 +1,5 @@
 import { Request, Response } from 'express';
 import { PrismaClient } from '@prisma/client';
-import fs from 'fs';
-import path from 'path';
 import { addDays } from 'date-fns';
 
 const prisma = new PrismaClient();
@@ -17,7 +15,9 @@ export class PaymentController {
     }
 
     try {
-      if (!req.file) throw new Error('No file uploaded'); // Jika file tidak diunggah, lemparkan error
+if (!req.body.fileUrl) throw new Error('No file uploaded or upload failed'); 
+
+ const link = req.body.fileUrl; // ⭐️ Use the full Cloudinary URL
 
       // Buat tautan publik untuk file yang diunggah
       const link = `${base_url}/public/payment-proof/${req.file.filename}`;

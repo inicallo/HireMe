@@ -278,11 +278,10 @@ export class UserController {
         tempat_lahir,
         DateOfBirth,
         years_of_experience,
+        fileUrl, 
       } = req.body;
+      const profilePictureUrl = fileUrl || undefined;
 
-      const profilePictureUrl = req.file
-        ? `${base_url}/public/profile_pictures/${req.file.filename}`
-        : undefined;
 
       const userId = req.user?.user_id;
       if (!userId) throw new Error('Account not authenticated');
