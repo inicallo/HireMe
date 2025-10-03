@@ -9,6 +9,9 @@ import { checkSubscriptionStatus } from '@/lib/subsDashboard';
 import ResumeForm from './components/resumeform';
 import { getToken } from '@/lib/server';
 
+// Define a unique ID for the subscription error toast to prevent duplication in Strict Mode
+const SUBSCRIPTION_ERROR_ID = 'inactive-sub-error'; 
+
 export default function CvDashboard() {
   const [isActiveSubscription, setIsActiveSubscription] = useState<
     boolean | null
@@ -19,33 +22,7 @@ export default function CvDashboard() {
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
-  useEffect(() => {
-    const checkSubscription = async () => {
-      const token = await getToken();
-      if (!token) {
-        toast.error('Unauthorized: No token found');
-        setIsActiveSubscription(false);
-        return;
-      }
-
-      const result = await checkSubscriptionStatus(token);
-      if (result.isActive) {
-        setIsActiveSubscription(true);
-        fetchCv(); // Fetch CV setelah memastikan subscription aktif
-      } else {
-        toast.error('You do not have an active subscription.');
-        setIsActiveSubscription(false);
-
-        setTimeout(() => {
-          router.push('/dashboard-candidate?tab=Subscription');
-        }, 3000);
-      }
-      fetchCv();
-    };
-
-    checkSubscription();
-  }, [router]);
-
+  // Fix 1: Position 'fetchCv' correctly for scope
   const fetchCv = async () => {
     setLoading(true);
     try {
@@ -62,6 +39,59 @@ export default function CvDashboard() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    const checkSubscription = async () => {
+      const token = await getToken();
+      if (!token) {
+        toast.error('Unauthorized: No token found');
+        setIsActiveSubscription(false);
+        return;
+      }
+
+      // Fix 2: Wrap API call in try...catch to handle thrown errors consistently
+      try {
+        // NOTE: checkSubscriptionStatus should now THROW an Error on 403 status.
+        const result = await checkSubscriptionStatus(token);
+        
+        if (result.isActive) {
+          setIsActiveSubscription(true);
+          fetchCv(); // Only call fetchCv on successful subscription check
+        } else {
+          // This block runs if the API returns 200 OK but isActive: false (less common)
+          if (!toast.isActive(SUBSCRIPTION_ERROR_ID)) {
+            toast.error('You do not have an active subscription.', {
+                toastId: SUBSCRIPTION_ERROR_ID,
+            });
+          }
+          setIsActiveSubscription(false);
+
+          setTimeout(() => {
+            router.push('/dashboard-candidate?tab=Subscription');
+          }, 3000);
+        }
+      } catch (error) {
+          // Fix 3: This catches the Error THROWN by checkSubscriptionStatus (on 403 Forbidden or network failure).
+          console.error("Subscription check failed:", error);
+          
+          // Use toastId to ensure the user only sees one message, regardless of React running twice.
+          if (!toast.isActive(SUBSCRIPTION_ERROR_ID)) {
+             toast.error('You do not have an active subscription.', {
+                 toastId: SUBSCRIPTION_ERROR_ID,
+             });
+          }
+          setIsActiveSubscription(false);
+
+          setTimeout(() => {
+            router.push('/dashboard-candidate?tab=Subscription');
+          }, 3000);
+      }
+      
+      // Fix 4: Removed the redundant, unconditional fetchCv() call here.
+    };
+
+    checkSubscription();
+  }, [router]);
 
   const handleCreate = () => {
     setIsCreating(true);

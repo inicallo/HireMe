@@ -1,7 +1,7 @@
 import { ISubsType } from '../types/substype';
 import { getToken } from './server';
 
-const base_url = process.env.NEXT_PUBLIC_BASE_API_URL
+const base_url = process.env.NEXT_PUBLIC_BASE_API_URL;
 
 interface SubstypeResponse {
   status: string;
@@ -37,7 +37,6 @@ export const getSubstypeById = async (
       throw new Error('Failed to fetch subs type by ID');
     }
 
-    // Pastikan respons API sesuai dengan tipe ISubsType
     const result: ISubsType = await res.json();
 
     return { substype: result, ok: true };
@@ -52,7 +51,7 @@ export const updateSubsType = async (
   updatedSubsType: ISubsType,
 ): Promise<{ data?: any; error?: string; ok: boolean }> => {
   try {
-    const token = await getToken(); // Ensure token retrieval is awaited
+    const token = await getToken();
 
     const response = await fetch(`${base_url}/plans/update/${subs_type_id}`, {
       method: 'PUT',
@@ -91,7 +90,7 @@ export const createSubsType = async (
     const response = await fetch(`${base_url}/plans/create`, {
       method: 'POST',
       headers: {
-        Authorization: `Bearer ${token}`, // Ensure the token is valid
+        Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(newSubsType),
@@ -120,7 +119,7 @@ export const deleteSubsType = async (
     const response = await fetch(`${base_url}/plans/delete/${subs_type_id}`, {
       method: 'DELETE',
       headers: {
-        Authorization: `Bearer ${token}`, // Ensure the token is valid
+        Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
       },
     });

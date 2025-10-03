@@ -351,13 +351,15 @@ export class AssessmentController {
           },
         },
       });
-      // Jika tidak ada badge ditemukan
       if (!passedBadges || passedBadges.length === 0) {
-        res.status(404).json({
-          message: `No badges found for user with ID ${user_id}.`,
-        });
-        return;
-      }
+  // 🚨 CHANGE THE RESPONSE STATUS AND DATA HERE 🚨
+  res.status(200).json({ // Changed from 404 to 200
+    // Keep the message informative
+    message: `No badges found for user with ID ${user_id}.`,
+    badges: [], // Send an empty array to the frontend
+  });
+  return;
+}
       // Respons jika badge ditemukan
       res.status(200).json({
         message: 'User badges retrieved successfully.',

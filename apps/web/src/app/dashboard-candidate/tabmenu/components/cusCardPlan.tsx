@@ -39,14 +39,16 @@ const CustomerCard: React.FC<CustomerCardProps> = ({ plan, onChoose }) => {
         ))}
       </ul>
       <button
-        onClick={plan.price > 0 ? onChoose : undefined} // Disable click jika harga 0
+        onClick={plan.price > 0 ? onChoose : undefined}
         className={`w-full py-2 rounded-lg flex items-center justify-center ${
-          plan.price > 0 ? 'bg-blue-500 text-white' : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+          plan.price > 0
+            ? 'bg-blue-500 text-white'
+            : 'bg-gray-300 text-gray-500 cursor-not-allowed'
         }`}
-        disabled={plan.price === 0} // Disabled button jika harga 0
+        disabled={plan.price === 0}
       >
         {plan.price > 0 ? 'Choose Plan' : 'Current Plan'}
-        <span>{plan.price > 0 ? <FaArrowRight className='ml-2'/> : ''}</span>
+        <span>{plan.price > 0 ? <FaArrowRight className="ml-2" /> : ''}</span>
       </button>
     </div>
   );

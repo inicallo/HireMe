@@ -89,7 +89,7 @@ export default function ResumeForm({
 
     setLoading(true);
     try {
-      const result = await createCv('ATS', resumeContent); // Pastikan template sesuai dengan API Anda
+      const result = await createCv('ATS', resumeContent);
 
       if (result.ok && result.cv) {
         toast.success(
@@ -217,18 +217,22 @@ export default function ResumeForm({
         </button>
       </div>
       <div className="mb-4">
-  <label className="block font-bold mb-2">Skills</label>
-  <textarea
-    className="w-full p-2 border rounded"
-    value={Array.isArray(resumeContent.skills) ? resumeContent.skills.join(', ') : ''} // Pastikan skills adalah array
-    onChange={(e) =>
-      handleChange(
-        'skills',
-        e.target.value.split(',').map((skill) => skill.trim()) // Pecah string menjadi array
-      )
-    }
-  />
-</div>
+        <label className="block font-bold mb-2">Skills</label>
+        <textarea
+          className="w-full p-2 border rounded"
+          value={
+            Array.isArray(resumeContent.skills)
+              ? resumeContent.skills.join(', ')
+              : ''
+          } // Pastikan skills adalah array
+          onChange={(e) =>
+            handleChange(
+              'skills',
+              e.target.value.split(',').map((skill) => skill.trim()), // Pecah string menjadi array
+            )
+          }
+        />
+      </div>
       <div className="mb-4">
         <h3 className="font-bold mb-2">Education</h3>
         {resumeContent.education.map((edu, index) => (

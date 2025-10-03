@@ -60,7 +60,7 @@ export class ApplicationController {
           resume: resumePath,
           coverLetter,
           expected_salary: expected_salary ? parseFloat(expected_salary) : null,
-          status: 'active',
+          status: 'pending',
           user: { connect: { user_id: userId } },
           job: { connect: { job_id: jobIdInt } },
         },
@@ -222,92 +222,84 @@ export class ApplicationController {
   }
 
   async getApplicationsByJobId(req: Request, res: Response) {
-    const jobId = parseInt(req.params.jobId, 10);
-  
-    try {
-      if (isNaN(jobId)) {
-        return res.status(400).json({ msg: 'Invalid Job ID' });
-      }
-  
-      const test = await prisma.preSelectionTest.findUnique({
-        where: { job_id: jobId },
-        select: { test_id: true },
-      });
-  
-      if (!test) {
-        return res.status(404).json({ msg: 'No test found for this job' });
-      }
-  
-      const testId = test.test_id;
-  
-      const applications = await prisma.application.findMany({
-        where: { job_id: jobId },
-        include: {
-          user: {
-            select: {
-              first_name: true,
-              last_name: true,
-              years_of_experience: true,
-              education: true,
-              profile_picture: true,
-              email: true,
-              phone: true,
-            },
-          },
-          job: {
-            select: {
-              job_title: true,
-            },
+  const jobId = parseInt(req.params.jobId, 10);
+
+  try {
+    if (isNaN(jobId)) {
+      return res.status(400).json({ msg: 'Invalid Job ID' });
+    }
+
+    // Try to find a pre-selection test for this job
+    const test = await prisma.preSelectionTest.findUnique({
+      where: { job_id: jobId },
+      select: { test_id: true },
+    });
+
+    const testId = test?.test_id ?? null;
+
+    // Get applications for this job
+    const applications = await prisma.application.findMany({
+      where: { job_id: jobId },
+      include: {
+        user: {
+          select: {
+            first_name: true,
+            last_name: true,
+            years_of_experience: true,
+            education: true,
+            profile_picture: true,
+            email: true,
+            phone: true,
           },
         },
-      });
-  
-      if (applications.length === 0) {
-        return res
-          .status(404)
-          .json({ msg: 'No applications found for this job' });
-      }
-  
-      // Ambil jawaban tes yang benar berdasarkan user_id dan test_id
-      const applicationsWithTestAnswers = await Promise.all(
-        applications.map(async (app) => {
-          const correctAnswersCount = await prisma.testAnswer.count({
+        job: {
+          select: { job_title: true },
+        },
+      },
+    });
+
+    if (applications.length === 0) {
+      return res.status(404).json({ msg: 'No applications found for this job' });
+    }
+
+    // If test exists, count correct answers; otherwise, skip
+    const applicationsWithTestAnswers = await Promise.all(
+      applications.map(async (app) => {
+        let correctAnswersCount = null;
+        if (testId) {
+          correctAnswersCount = await prisma.testAnswer.count({
             where: {
               user_id: app.user_id,
-              test_id: testId, // Menggunakan test_id yang ditemukan
+              test_id: testId,
               is_correct: true,
             },
           });
-  
-          return {
-            id: app.application_id,
-            name: `${app.user.first_name} ${app.user.last_name}`,
-            position: app.job.job_title,
-            email: app.user.email,
-            phone: app.user.phone,
-            experience: app.user.years_of_experience,
-            education: app.user.education,
-            dateApplied: app.applied_at,
-            resume: app.resume,
-            status: app.status,
-            photoUrl: app.user.profile_picture,
-            user_id: app.user_id,
-            correctAnswers: correctAnswersCount,
-          };
-        }),
-      );
-  
-      res.status(200).json({
-        applications: applicationsWithTestAnswers,
-      });
-    } catch (error) {
-      const err = error as Error;
-      res
-        .status(500)
-        .json({ msg: 'Failed to fetch applications', error: err.message });
-    }
+        }
+
+        return {
+          id: app.application_id,
+          name: `${app.user.first_name} ${app.user.last_name}`,
+          position: app.job.job_title,
+          email: app.user.email,
+          phone: app.user.phone,
+          experience: app.user.years_of_experience,
+          education: app.user.education,
+          dateApplied: app.applied_at,
+          resume: app.resume,
+          status: app.status,
+          photoUrl: app.user.profile_picture,
+          user_id: app.user_id,
+          correctAnswers: correctAnswersCount, // will be null if no test
+        };
+      })
+    );
+
+    res.status(200).json({ applications: applicationsWithTestAnswers });
+  } catch (error) {
+    const err = error as Error;
+    res.status(500).json({ msg: 'Failed to fetch applications', error: err.message });
   }
-  
+}
 
   async getInterviewApplicantsByCompany(req: Request, res: Response) {
     try {

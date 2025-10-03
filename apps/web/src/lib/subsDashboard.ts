@@ -1,7 +1,7 @@
 import { DashboardData } from '@/types/subsDashboard';
 import { getToken } from './server';
 
-const base_url = process.env.NEXT_PUBLIC_BASE_API_URL
+const base_url = process.env.NEXT_PUBLIC_BASE_API_URL;
 
 export const fetchSubsDashboardData = async (): Promise<{
   data?: DashboardData;
@@ -37,33 +37,23 @@ export const fetchSubsDashboardData = async (): Promise<{
 export const checkSubscriptionStatus = async (
   token: string,
 ): Promise<{ isActive: boolean; message?: string }> => {
-  try {
-    const response = await fetch(`${base_url}/subscription/check-active`, {
-      method: 'GET',
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
+  const response = await fetch(`${base_url}/subscription/check-active`, {
+    method: 'GET',
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
 
-    if (!response.ok) {
-      const errorData = await response.json();
-      return {
-        isActive: false,
-        message: errorData.message || 'Failed to fetch subscription status',
-      };
-    }
+  if (!response.ok) {
+    // THROW on 403 Forbidden status, ensuring the frontend component's try/catch runs.
+    const errorData = await response.json().catch(() => ({}));
+    const errorMessage =
+      errorData.message || 'Subscription check failed with non-200 status.';
 
-    const data = await response.json();
-    return { isActive: data.isActive };
-  } catch (error) {
-    console.error('Error checking subscription status:', error);
-    return {
-      isActive: false,
-      message: 'An error occurred while checking subscription status',
-    };
+    throw new Error(errorMessage);
   }
+
+  // If response is 200 OK, return the active status.
+  const data = await response.json();
+  return { isActive: data.isActive };
 };
-
-
-
-

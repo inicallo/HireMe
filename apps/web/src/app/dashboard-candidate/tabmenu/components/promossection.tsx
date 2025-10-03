@@ -10,19 +10,19 @@ const PromoSection: React.FC = () => {
           Buy Premium Subscription to Premium Feature
         </h2>
         <p className="text-gray-600">
-          Donec eu dui ut dolor commodo ornare. Sed arcu libero, malesuada quis
-          justo sit amet, varius tempus neque. Quisque ultrices mi sed lorem
-          condimentum, vel tempus lectus ultricies.
+          Gain a competitive edge in the job market with our exclusive features.
+          Upgrade your plan to access advanced tools, unlimited skill
+          assessments, and priority application support.
         </p>
       </div>
 
       {/* Bagian Gambar */}
       <div className="md:w-1/2 flex justify-center">
         <Image
-          src="/assets/Subsmenu.png" // Gantilah dengan path gambar yang sesuai
+          src="/assets/Subsmenu.png"
           alt="Illustration"
-          width={400} // Tentukan lebar yang diinginkan
-          height={300} // Tentukan tinggi yang diinginkan
+          width={400}
+          height={300}
           className="object-contain"
         />
       </div>

@@ -17,16 +17,13 @@ export const Footer = () => {
             <h2 className="text-white text-lg font-bold mb-4">HireMe</h2>
             <p className="text-sm">
               Call now:{' '}
-              <Link href="tel:+60327789000" className="text-white">
-                (+60) 3 2778 9000
+              <Link href="tel:+622127789000" className="text-white">
+                (+62) 21 2778 9000
               </Link>
             </p>
-            <p className="text-sm">HireMe.com Sdn Bhd</p>
+            <p className="text-sm">PT. HireMe Indonesia</p>
             <p className="text-sm">
-              Lv 16, Menara AIA Cap Square,
-            </p>
-            <p className="text-sm">No. 10, Jalan Munshi Abdullah</p>
-            <p className="text-sm">Kuala Lumpur 50100</p>
+              Lantai 30, Revenue Tower District 8 SCBD</p>
           </div>
 
           {/* Quick Link section */}
@@ -129,8 +126,41 @@ export const Footer = () => {
           <div className="flex flex-col md:flex-row items-center justify-between text-center md:text-left">
             {/* Copyright Text */}
             <p className="text-sm text-gray-500 mb-4 md:mb-0">
-              © 2024 HireMe - Job Portal. All rights reserved.
+              © 2024 HireMe - By{' '}
+              <Link
+                href="https://www.linkedin.com/in/calvinangelo/"
+                className="hover:text-white transition-colors"
+                target="_blank"
+              >
+                Calvin Angelo
+              </Link>
+              ,{' '}
+              <Link
+                href="https://www.linkedin.com/in/muhammad-rezaldo-999642317/"
+                className="hover:text-white transition-colors"
+                target="_blank"
+              >
+                Muhammad Rezaldo
+              </Link>
+              ,{' '}
+              <Link
+                href="https://www.linkedin.com/in/naufalhh/"
+                className="hover:text-white transition-colors"
+                target="_blank"
+              >
+                Naufal Hesantra Harijadi
+              </Link>{' '}
+              (
+              <Link
+                href="https://www.purwadhika.com/"
+                className="hover:text-white transition-colors"
+                target="_blank"
+              >
+                Purwadhika Digital Technology School
+              </Link>
+              )
             </p>
+
 
             {/* Social Media Icons */}
             <div className="flex justify-center md:justify-end space-x-4">

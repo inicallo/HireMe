@@ -84,7 +84,7 @@ const ContactPage = () => {
                   className="input input-bordered w-2/3 mt-2 p-3 rounded-lg border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   value={contactNumber}
                   onChange={(e) => setContactNumber(e.target.value)}
-                  placeholder="+6014650819"
+                  placeholder="+628127789000"
                 />
               </div>
             </div>
@@ -167,11 +167,12 @@ const ContactPage = () => {
 
           <div className="space-y-6 text-gray-700">
             <div>
-              <h4 className="font-semibold">Kuala Lumpur</h4>
-              <p>Agensi Pekerjaan HireMe.com Sdn Bhd</p>
-              <p>Level 16, Menara AIA Cap Square, <br /> No. 10, Jalan Munshi Abdullah</p>
-              <p>Kuala Lumpur 50100</p>
-              <p>Customer Service and Sales: <a href="tel:+60327789000" className="text-blue-600">+60 3 2778 9000</a></p>
+              <h4 className="font-semibold">Jakarta</h4>
+              <p>PT. HireMe Indonesia</p>
+              <p>Lantai 30, District 8 SCBD, Revenue Tower, <br /> Jl. Jend. Sudirman kav 52-53 No.Lot 13</p>
+              <p>Senayan, Kec. Kby. Baru, Kota Jakarta Selatan,</p>
+              <p>Daerah Khusus Ibukota Jakarta 12190</p>
+              <p>Customer Service and Sales: <a href="tel:+62213277890" className="text-blue-600">+62 21 2778 9000</a></p>
             </div>
             <div>
               <h4 className="font-semibold">Penang</h4>

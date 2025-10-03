@@ -1,15 +1,15 @@
 {
   "private": true,
   "scripts": {
-  "build": "turbo run build",
-  "dev": "turbo run dev",
-  "lint": "turbo run lint",
-  "test": "turbo run test",
-  "serve": "turbo run serve",
-  "format": "prettier --write \"**/*.{ts,tsx,md}\"",
-  "prepare": "husky install",
-  "postprepare": "node -e \"if (process.platform !== 'win32') { require('child_process').execSync('chmod +x .husky/*') }\""
-},
+    "build": "turbo run build",
+    "dev": "turbo run dev",
+    "lint": "turbo run lint",
+    "test": "turbo run test",
+    "serve": "turbo run serve",
+    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "prepare": "husky install",
+    "postprepare": "node -e \"if (process.platform !== 'win32') { require('child_process').execSync('chmod +x .husky/*') }\""
+  },
   "devDependencies": {
     "@commitlint/cli": "^18.4.2",
     "@commitlint/config-conventional": "^18.4.2",
@@ -41,7 +41,6 @@
     "axios": "^1.7.2",
     "daisyui": "^4.12.14",
     "date-fns": "^4.1.0",
-    "jwt-decode": "^4.0.0",
     "lodash": "^4.17.21",
     "next": "^15.0.3",
     "npm-force-resolutions": "^0.0.10",

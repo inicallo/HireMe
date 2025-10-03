@@ -30,21 +30,21 @@ const CustomerPlans: React.FC = () => {
   useEffect(() => {
     const validateUser = async () => {
       try {
-        const token = await getToken(); // Ambil token dari localStorage
+        const token = await getToken();
         if (!token) {
           toast.error('User not logged in.');
-          router.push('/sign-in'); // Redirect ke halaman login jika token tidak ditemukan
+          router.push('/sign-in');
           return;
         }
 
         const decodedToken = jwtDecode<DecodedToken>(token);
         if (decodedToken.role !== 'candidate') {
           toast.error('Access denied. Only candidates can view this page.');
-          router.push('/'); // Redirect jika bukan role candidate
+          router.push('/');
           return;
         }
 
-        setUserRole(decodedToken.role); // Set user role
+        setUserRole(decodedToken.role);
       } catch (error) {
         console.error('Failed to validate user:', error);
         toast.error('Invalid token or user not authorized.');
@@ -80,11 +80,11 @@ const CustomerPlans: React.FC = () => {
       return;
     }
 
-    const uniqueCode = Math.floor(10 + Math.random() * 90); // Random 2-digit unique code
-    const modifiedPrice = parseInt(`${plan.price.toString().slice(0, -2)}${uniqueCode}`); // Replace last 2 digits with unique code
+    const uniqueCode = Math.floor(10 + Math.random() * 90);
+    const modifiedPrice = parseInt(`${plan.price.toString().slice(0, -2)}${uniqueCode}`);
     setTotalPrice(modifiedPrice);
     setSelectedPlan(plan);
-    setSelectedBank(banks[0]); // Default to first bank
+    setSelectedBank(banks[0]);
   };
 
   const handleCloseModal = () => {

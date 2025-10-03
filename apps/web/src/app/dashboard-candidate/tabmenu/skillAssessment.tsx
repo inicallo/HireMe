@@ -49,14 +49,13 @@ const UserAssessment: React.FC = () => {
           toast.error('You do not have an active subscription.');
           setIsActiveSubscription(false);
 
-          // Redirect to CustomerPlans after 3 seconds
           setTimeout(() => {
             router.push('/dashboard-candidate?tab=Subscription');
           }, 3000);
         }
       } catch (error) {
         console.error('Error checking subscription status:', error);
-        toast.error('Failed to check subscription status.');
+        toast.error('An unexpected error occurred while verifying subscription.');
         setIsActiveSubscription(false);
       } finally {
         setLoading(false);

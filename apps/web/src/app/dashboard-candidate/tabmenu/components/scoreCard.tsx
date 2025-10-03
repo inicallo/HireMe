@@ -8,8 +8,8 @@ interface ScoreCardProps {
   unique_code: string;
   created_at: string;
   assessment_data: string;
-  score_id: number; // Tambahkan score_id sebagai prop
-  onGenerateCertificate: (score_id: number) => void; // Ubah parameter menjadi score_id
+  score_id: number;
+  onGenerateCertificate: (score_id: number) => void;
 }
 
 const ScoreCard: React.FC<ScoreCardProps> = ({
@@ -19,10 +19,9 @@ const ScoreCard: React.FC<ScoreCardProps> = ({
   unique_code,
   created_at,
   assessment_data,
-  score_id, // Terima score_id
+  score_id,
   onGenerateCertificate,
 }) => {
-  // Format tanggal ke format Indonesia
   const formatDateToIndonesian = (date: string): string => {
     return format(new Date(date), "dd MMMM yyyy, HH:mm");
   };
@@ -63,7 +62,7 @@ const ScoreCard: React.FC<ScoreCardProps> = ({
       {status === "passed" && (
         <div className="mt-6 text-right">
           <button
-            onClick={() => onGenerateCertificate(score_id)} // Panggil fungsi dengan score_id
+            onClick={() => onGenerateCertificate(score_id)}
             className="bg-blue-500 text-white font-medium px-4 py-2 rounded-lg hover:bg-blue-600 transition"
           >
             Generate Certificate

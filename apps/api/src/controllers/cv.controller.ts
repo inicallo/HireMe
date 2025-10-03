@@ -1,9 +1,8 @@
 import { Request, Response } from 'express';
-import prisma from '../prisma'; // Adjust path as needed
-import { generatePdf } from '../utils/pdfCVGenerator'; // Utility for PDF export
+import prisma from '../prisma';
+import { generatePdf } from '../utils/pdfCVGenerator';
 
 export class CvController {
-  // Create or Update CV
   async createOrUpdateCV(req: Request, res: Response) {
     try {
       const user_id = req.user?.user_id;
@@ -14,14 +13,11 @@ export class CvController {
           .status(401)
           .json({ status: 'error', message: 'Unauthorized' });
       }
-
-      // Check if user already has a CV
       const existingCv = await prisma.cV.findFirst({
         where: { user_id },
       });
 
       if (existingCv) {
-        // Update the existing CV
         const updatedCv = await prisma.cV.update({
           where: { cv_id: existingCv.cv_id },
           data: { template, content },
@@ -34,7 +30,6 @@ export class CvController {
         });
       }
 
-      // Create a new CV if not exists
       const newCv = await prisma.cV.create({
         data: {
           user_id,
@@ -55,13 +50,11 @@ export class CvController {
     }
   }
 
-  // Get CV
   async getCVbyId(req: Request, res: Response) {
     try {
-      const user_id = req.user?.user_id; // Ambil user_id dari middleware autentikasi
-      const cv_id = parseInt(req.params.cv_id, 10); // Konversi cv_id ke integer
+      const user_id = req.user?.user_id;
+      const cv_id = parseInt(req.params.cv_id, 10);
   
-      // Validasi jika cv_id bukan angka
       if (isNaN(cv_id)) {
         return res.status(400).json({
           status: 'error',
@@ -69,12 +62,10 @@ export class CvController {
         });
       }
   
-      // Cari CV berdasarkan cv_id
       const cv = await prisma.cV.findUnique({
         where: { cv_id },
       });
   
-      // Jika CV tidak ditemukan
       if (!cv) {
         return res.status(404).json({
           status: 'error',
@@ -82,7 +73,6 @@ export class CvController {
         });
       }
   
-      // Pastikan hanya pemilik CV yang dapat mengakses
       if (cv.user_id !== user_id) {
         return res.status(403).json({
           status: 'error',
@@ -90,7 +80,6 @@ export class CvController {
         });
       }
   
-      // Jika valid, kirim respons sukses
       res.status(200).json({
         status: 'success',
         data: cv,
@@ -98,7 +87,7 @@ export class CvController {
     } catch (error: unknown) {
       const message =
         error instanceof Error ? error.message : 'Unknown error occurred';
-      console.error('Error fetching CV:', error); // Logging untuk debugging
+      console.error('Error fetching CV:', error);
       res.status(500).json({
         status: 'error',
         message,
@@ -119,7 +108,7 @@ export class CvController {
       });
   
       if (!cvs || cvs.length === 0) {
-        return res.status(404).json({ message: 'No CVs found for this user.' });
+        return res.status(200).json({ cvs: [] });
       }
   
       res.status(200).json({ cvs });
@@ -129,8 +118,6 @@ export class CvController {
     }
   }
   
-
-  // Download CV
   async downloadCV(req: Request, res: Response) {
     try {
       const user_id = req.user?.user_id;

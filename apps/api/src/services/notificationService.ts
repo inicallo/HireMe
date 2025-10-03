@@ -67,7 +67,7 @@ export async function notifyApplicationStatusChange(
     link: `/applications/${applicationId}`,
   });
 
-  const templatePath = path.join(__dirname, '../templates/applicationStatusUpdate.hbs');
+  const templatePath = path.join(process.cwd(), 'src/templates/applicationStatusUpdate.hbs');
   const templateSource = fs.readFileSync(templatePath, 'utf-8');
   const compiledTemplate = handlebars.compile(templateSource);
 
