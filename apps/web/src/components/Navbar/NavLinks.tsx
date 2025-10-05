@@ -41,8 +41,6 @@ const NavLinks: React.FC<NavLinksProps> = ({ userRole }) => {
     <>
       <li><Link href="/job-page" className="hover:text-Primary-blue">Find Job</Link></li>
       <li><Link href="/company-page" className="hover:text-Primary-blue">Find Employers</Link></li>
-      <li><Link href="/candidates" className="hover:text-Primary-blue">Candidates</Link></li>
-      <li><Link href="/pricing-plans" className="hover:text-Primary-blue">Pricing Plans</Link></li>
       <li><Link href="/contact-support" className="hover:text-Primary-blue">Customer Supports</Link></li>
     </>
   );
