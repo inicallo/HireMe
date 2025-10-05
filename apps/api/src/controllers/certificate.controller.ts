@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
-import { certificatePDF } from '#/utils/pdfCertificate';
+import { certificatePDF } from '../utils/pdfCertificate';
 import QRCode from 'qrcode';
-import prisma from '#/prisma';
+import prisma from '../prisma';
 
 interface AuthRequest extends Request {
   user?: {

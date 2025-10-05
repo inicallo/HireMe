@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import prisma from '#/prisma';
+import prisma from '../prisma';
 
 export class PreSelectionTestController {
   async createTestLink(req: Request, res: Response) {

@@ -1,8 +1,8 @@
-import { CvController } from '#/controllers/cv.controller';
+import { CvController } from '../controllers/cv.controller';
 import {
   checkActiveSubscription,
-} from '#/middlewares/premiumFeature';
-import { verifyToken } from '#/middlewares/token';
+} from '../middlewares/premiumFeature';
+import { verifyToken } from '../middlewares/token';
 import { Router } from 'express';
 
 export class CvRouter {

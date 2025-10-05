@@ -4,9 +4,6 @@
   "description": "",
   "type": "commonjs",
   "main": "src/index.ts",
-  "imports": {
-    "#/*": "./dist/*"
-  },
   "scripts": {
     "dev": "cross-env NODE_ENV=development ts-node-dev -r tsconfig-paths/register src/index.ts",
     "build": "prisma generate && tsc",

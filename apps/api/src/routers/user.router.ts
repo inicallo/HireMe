@@ -1,9 +1,9 @@
-import { UserController } from '#/controllers/user.controller';
-import { verifyToken } from '#/middlewares/token';
-import { uploader } from '#/middlewares/uploader';
-import { cloudinaryUploader } from '#/middlewares/cloudinary.middleware';
-import { fetchUserName } from '#/middlewares/fetchUserName';
-import { generatePublicId } from '#/routers/application.router';
+import { UserController } from '../controllers/user.controller';
+import { verifyToken } from '../middlewares/token';
+import { uploader } from '../middlewares/uploader';
+import { cloudinaryUploader } from '../middlewares/cloudinary.middleware';
+import { fetchUserName } from '../middlewares/fetchUserName';
+import { generatePublicId } from '../routers/application.router';
 import { Router } from 'express';
 
 const profilePictureUploader = uploader('profile', 'profile_picture');

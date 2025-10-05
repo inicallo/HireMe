@@ -1,4 +1,4 @@
-import prisma from '#/prisma';
+import prisma from '../prisma';
 import { $Enums, Prisma } from '@prisma/client';
 import { Request, Response } from 'express';
 

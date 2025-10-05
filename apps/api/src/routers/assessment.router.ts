@@ -1,9 +1,9 @@
 import { Router } from "express";
-import { AssessmentController } from '#/controllers/assessment.controller';
-import { verifyToken } from '#/middlewares/token';
-import { checkDeveloperRole } from '#/middlewares/checkRole';
-import { verifyAssessmentToken } from '#/middlewares/tokenassessment';
-import { checkFeatureLimit } from '#/middlewares/premiumFeature';
+import { AssessmentController } from '../controllers/assessment.controller';
+import { verifyToken } from '../middlewares/token';
+import { checkDeveloperRole } from '../middlewares/checkRole';
+import { verifyAssessmentToken } from '../middlewares/tokenassessment';
+import { checkFeatureLimit } from '../middlewares/premiumFeature';
 
 export class AssessmentRouter {
   private router: Router;

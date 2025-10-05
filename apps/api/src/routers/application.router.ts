@@ -1,11 +1,11 @@
 import { Router, Request, Response } from 'express';
-import { ApplicationController } from '#/controllers/application.controller';
-import { verifyToken } from '#/middlewares/token';
-import { validateApplicationData } from '#/middlewares/validateApplicationData';
-import { uploader } from '#/middlewares/uploader';
-import { checkAdminDev, checkCandidate } from '#/middlewares/checkRole';
-import { cloudinaryUploader } from '#/middlewares/cloudinary.middleware';
-import { fetchUserName } from '#/middlewares/fetchUserName';
+import { ApplicationController } from '../controllers/application.controller';
+import { verifyToken } from '../middlewares/token';
+import { validateApplicationData } from '../middlewares/validateApplicationData';
+import { uploader } from '../middlewares/uploader';
+import { checkAdminDev, checkCandidate } from '../middlewares/checkRole';
+import { cloudinaryUploader } from '../middlewares/cloudinary.middleware';
+import { fetchUserName } from '../middlewares/fetchUserName';
 
 const resumeUploader = uploader('resume', 'resume');
 

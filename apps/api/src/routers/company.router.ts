@@ -1,10 +1,10 @@
-import { CompanyController } from '#/controllers/company.controller';
-import { verifyToken } from '#/middlewares/token';
-import { logoBannerUploader } from '#/middlewares/logoBannerUploader';
+import { CompanyController } from '../controllers/company.controller';
+import { verifyToken } from '../middlewares/token';
+import { logoBannerUploader } from '../middlewares/logoBannerUploader';
 import { Router } from 'express';
-import { checkAdminDev } from '#/middlewares/checkRole';
-import { handleCompanyMedia } from '#/middlewares/companyMediaHandler';
-import { fetchUserName } from '#/middlewares/fetchUserName';
+import { checkAdminDev } from '../middlewares/checkRole';
+import { handleCompanyMedia } from '../middlewares/companyMediaHandler';
+import { fetchUserName } from '../middlewares/fetchUserName';
 
 export class CompanyRouter {
   private router: Router;
