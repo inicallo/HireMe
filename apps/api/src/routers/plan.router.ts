@@ -1,7 +1,7 @@
 import { Router } from 'express';
-import { SubsController } from '@/controllers/plan.controller';
-import { verifyToken } from '@/middlewares/token';
-import { checkDeveloperRole } from '@/middlewares/checkRole';
+import { SubsController } from '../controllers/plan.controller';
+import { verifyToken } from '../middlewares/token';
+import { checkDeveloperRole } from '../middlewares/checkRole';
 
 export class SubsTypeRouter {
   private router: Router;
