@@ -1,7 +1,7 @@
 // fetchUserName.ts
 
 import { Request, Response, NextFunction } from 'express';
-import prisma from '@/prisma'; // Assuming this import works
+import prisma from '#/prisma'; // Assuming this import works
 
 export const fetchUserName = async (
   req: Request,

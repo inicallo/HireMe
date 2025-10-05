@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import prisma from "@/prisma"; // ✅ USE the shared prisma client
+import prisma from "#/prisma"; // ✅ USE the shared prisma client
 
 export const checkActiveSubscription = async (req: Request, res: Response, next: NextFunction) => {
   try {
