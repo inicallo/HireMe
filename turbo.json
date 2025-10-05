@@ -4,7 +4,21 @@
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
-      "outputs": [".next/**", "!.next/cache/**"]
+      "outputs": [".next/**", "!.next/cache/**"],
+      "env": [
+        "MONGODB_URI",
+        "CLOUDINARY_URL",
+        "SECRET_JWT",
+        "MAIL_USER",
+        "MAIL_PASS",
+        "CLOUDINARY_CLOUD_NAME",
+        "CLOUDINARY_API_KEY",
+        "CLOUDINARY_API_SECRET",
+        "BASE_API_URL",
+        "BASE_FE_URL",
+        "NODE_ENV",
+        "PORT"
+      ]
     },
     "lint": {},
     "test": {},
