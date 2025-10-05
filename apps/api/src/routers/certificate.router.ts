@@ -1,6 +1,6 @@
 import { Router } from "express";
-import { verifyToken } from "@/middlewares/token";
-import { CertificateController } from "@/controllers/certificate.controller";
+import { verifyToken } from "#/middlewares/token";
+import { CertificateController } from "#/controllers/certificate.controller";
 
 export class CertificateRouter {
   private router: Router;

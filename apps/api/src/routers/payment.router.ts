@@ -1,11 +1,11 @@
 import { Router } from 'express';
-import { PaymentController } from '@/controllers/payment.controller';
-import { verifyToken } from '@/middlewares/token';
-import { checkDeveloperRole } from '@/middlewares/checkRole';
-import { uploader } from '@/middlewares/uploader';
-import { cloudinaryUploader } from '@/middlewares/cloudinary.middleware'; 
-import { fetchUserName } from '@/middlewares/fetchUserName';
-import { generatePublicId } from '@/routers/application.router'; 
+import { PaymentController } from '#/controllers/payment.controller';
+import { verifyToken } from '#/middlewares/token';
+import { checkDeveloperRole } from '#/middlewares/checkRole';
+import { uploader } from '#/middlewares/uploader';
+import { cloudinaryUploader } from '#/middlewares/cloudinary.middleware'; 
+import { fetchUserName } from '#/middlewares/fetchUserName';
+import { generatePublicId } from '#/routers/application.router'; 
 
 export class PaymentRouter {
   private router: Router;

@@ -1,7 +1,7 @@
-import { verifyToken } from '@/middlewares/token';
-import { checkAdminDev, checkRole, checkCandidate} from '@/middlewares/checkRole';
+import { verifyToken } from '#/middlewares/token';
+import { checkAdminDev, checkRole, checkCandidate} from '#/middlewares/checkRole';
 import { Router } from 'express';
-import { FavoriteJobController } from '@/controllers/favoriteJob.controller';
+import { FavoriteJobController } from '#/controllers/favoriteJob.controller';
 
 export class FavoriteJobRouter {
   private router: Router;

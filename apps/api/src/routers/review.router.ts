@@ -1,6 +1,6 @@
 import { Router } from 'express';
-import { verifyToken } from '@/middlewares/token';
-import { ReviewController } from '@/controllers/review.controller';
+import { verifyToken } from '#/middlewares/token';
+import { ReviewController } from '#/controllers/review.controller';
 
 export class ReviewRouter {
   private router: Router;

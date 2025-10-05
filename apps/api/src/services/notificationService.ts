@@ -1,11 +1,11 @@
-import prisma from '@/prisma';
+import prisma from '#/prisma';
 import { NotificationType } from '@prisma/client';
-import { transporter } from '@/helpers/notmailer';
+import { transporter } from '#/helpers/notmailer';
 import path from 'path';
 import fs from 'fs';
 import handlebars from 'handlebars';
-import { getFriendlyStatus } from '@/utils/applicationStatusMapper';
-import { base_fe_url } from '@/controllers/user.controller';
+import { getFriendlyStatus } from '#/utils/applicationStatusMapper';
+import { base_fe_url } from '#/controllers/user.controller';
 
 export async function sendNotification({
   userId,

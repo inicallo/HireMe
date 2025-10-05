@@ -1,6 +1,6 @@
-import { PreSelectionTestController } from '@/controllers/preselection.controller';
-import { verifyToken } from '@/middlewares/token';
-import { checkAdminDev } from '@/middlewares/checkRole';
+import { PreSelectionTestController } from '#/controllers/preselection.controller';
+import { verifyToken } from '#/middlewares/token';
+import { checkAdminDev } from '#/middlewares/checkRole';
 import { Router } from 'express';
 
 export class PreSelectionTestRouter {

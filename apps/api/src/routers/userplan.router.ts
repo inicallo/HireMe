@@ -1,6 +1,6 @@
 import { Router } from 'express';
-import { UserPlanController } from '@/controllers/userplan.controller';
-import { verifyToken } from '@/middlewares/token';
+import { UserPlanController } from '#/controllers/userplan.controller';
+import { verifyToken } from '#/middlewares/token';
 
 
 export class PlanBillRouter {

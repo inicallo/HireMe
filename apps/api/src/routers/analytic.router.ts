@@ -1,7 +1,5 @@
-import { verifyToken } from '@/middlewares/token';
-import { checkAdminDev, checkRole } from '@/middlewares/checkRole';
 import { Router } from 'express';
-import { AnalyticsController } from '@/controllers/analytics.controller';
+import { AnalyticsController } from '#/controllers/analytics.controller';
 
 export class AnalyticsRouter {
   private router: Router;

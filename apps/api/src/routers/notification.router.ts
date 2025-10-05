@@ -1,5 +1,5 @@
-import { NotificationController } from '@/controllers/notification.controller';
-import { verifyToken } from '@/middlewares/token';
+import { NotificationController } from '#/controllers/notification.controller';
+import { verifyToken } from '#/middlewares/token';
 import { Router } from 'express';
 
 export class NotificationRouter {

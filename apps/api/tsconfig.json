@@ -1,18 +1,18 @@
 {
   "compilerOptions": {
-    "target": "ES2015",
-    "module": "commonjs",
+    "target": "ES2022",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "paths": {
+      "#/*": ["./src/*"]
+    },
+    "outDir": "./dist",
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
-    "outDir": "./dist",
-    "types": ["./src/custom.d.ts"],
-    "paths": {
-      "@/*": ["./src/*"]
-    }
+    "types": ["./src/custom.d.ts"]
   },
-  // "include": ["src/**/*"],
   "include": ["**/*.ts"],
   "exclude": ["node_modules"]
 }

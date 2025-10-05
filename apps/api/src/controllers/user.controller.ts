@@ -1,8 +1,8 @@
-import prisma from '@/prisma';
+import prisma from '#/prisma';
 import { Request, Response } from 'express';
 import { compare, genSalt, hash } from 'bcrypt';
 import { sign, verify } from 'jsonwebtoken';
-import { transporter } from '@/helpers/notmailer';
+import { transporter } from '#/helpers/notmailer';
 import path from 'path';
 import fs from 'fs';
 import handlebars from 'handlebars';

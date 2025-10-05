@@ -1,6 +1,6 @@
-import { JobController } from '@/controllers/job.controller';
-import { verifyToken } from '@/middlewares/token';
-import { checkAdminDev, checkRole, checkCandidate} from '@/middlewares/checkRole';
+import { JobController } from '#/controllers/job.controller';
+import { verifyToken } from '#/middlewares/token';
+import { checkAdminDev, checkRole, checkCandidate} from '#/middlewares/checkRole';
 import { Router } from 'express';
 
 export class JobRouter {

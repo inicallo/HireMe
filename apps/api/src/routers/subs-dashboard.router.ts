@@ -1,8 +1,8 @@
-import { DashboardController } from '@/controllers/subscript.controller';
-import { checkDeveloperRole } from '@/middlewares/checkRole';
-import { verifyToken } from '@/middlewares/token';
+import { DashboardController } from '#/controllers/subscript.controller';
+import { checkDeveloperRole } from '#/middlewares/checkRole';
+import { verifyToken } from '#/middlewares/token';
 import { Router } from 'express';
-import { checkActiveSubscription } from '@/middlewares/premiumFeature'; 
+import { checkActiveSubscription } from '#/middlewares/premiumFeature'; 
 
 export class SubscriptionDashboardRouter {
   private router: Router;

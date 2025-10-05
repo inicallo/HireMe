@@ -1,14 +1,14 @@
-import prisma from '@/prisma';
+import prisma from '#/prisma';
 import {
   notifyApplicationStatusChange,
   sendNotification,
-} from '@/services/notificationService';
+} from '#/services/notificationService';
 import { Request, Response } from 'express';
 import { ApplicationStatus, NotificationType } from '@prisma/client';
 import path from 'path';
 import fs from 'fs';
 import handlebars from 'handlebars';
-import { transporter } from '@/helpers/notmailer';
+import { transporter } from '#/helpers/notmailer';
 
 export const base_url = process.env.BASE_API_URL;
 export const base_fe_url = process.env.BASE_FE_URL;
