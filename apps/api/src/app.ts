@@ -65,7 +65,6 @@ export default class App {
   }
 
   private routes(): void {
-
     const planRouter = new SubsTypeRouter();
     const reviewRouter = new ReviewRouter();
     const subscriptRouter = new SubscriptionDashboardRouter();
@@ -82,7 +81,6 @@ export default class App {
     const certificateRouter = new CertificateRouter();
     const preSelectionTestRouter = new PreSelectionTestRouter();
     const analyticsRouter = new AnalyticsRouter();
-
 
     this.app.get('/api', (req: Request, res: Response) => {
       res.send(`Hello, Purwadhika Student API!`);
