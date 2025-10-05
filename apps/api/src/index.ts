@@ -7,4 +7,4 @@ const app = new App();
 const expressApp = app.getApp();
 
 // Export the instance for Vercel to use
-export default expressApp;
+module.exports = expressApp;
