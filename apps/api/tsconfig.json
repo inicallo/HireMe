@@ -9,11 +9,9 @@
     "forceConsistentCasingInFileNames": true,
     "outDir": "./dist",
     "types": ["./src/custom.d.ts"],
-    "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"]
-    },
-    "ignoreDeprecations": "6.0" 
+    }
   },
   "include": ["**/*.ts"],
   "exclude": ["node_modules"]
