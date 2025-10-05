@@ -8,7 +8,6 @@ import { useAppDispatch, useAppSelector } from '@/redux/hooks';
 import { logoutAction } from '@/redux/slice/authorSlice';
 import { UserRole } from '@/types/role';
 import { useRouter } from 'next/navigation';
-import logo from '../../assets/logo.png';
 import { toast } from 'react-toastify';
 import NavLinks from './NavLinks';
 import AuthButtons from './AuthButtons';
@@ -40,7 +39,7 @@ const Navbar = () => {
         {/* Logo and Branding */}
         <div className="flex items-center space-x-2">
           <Image
-            src={logo}
+            src="/logo.png"
             alt="Logo"
             width={40}
             height={40}
