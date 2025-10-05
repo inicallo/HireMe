@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
-import prisma from '../prisma';
-import { generatePdf } from '../utils/pdfCVGenerator';
+import prisma from '@/prisma';
+import { generatePdf } from '@/utils/pdfCVGenerator';
 
 export class CvController {
   async createOrUpdateCV(req: Request, res: Response) {

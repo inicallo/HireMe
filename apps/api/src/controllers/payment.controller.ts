@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import prisma from '@/prisma'; // Import your prisma client instance
+import prisma from '@/prisma';
 
 const base_url = process.env.BASE_API_URL;
 

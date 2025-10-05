@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { certificatePDF } from '@/utils/pdfCertificate'; // Correct import
+import { certificatePDF } from '@/utils/pdfCertificate';
 import QRCode from 'qrcode';
 import prisma from '@/prisma';
 

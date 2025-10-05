@@ -1,4 +1,3 @@
-// controllers/analytics.controller.ts
 import { Request, Response } from 'express';
 import prisma from '@/prisma';
 
