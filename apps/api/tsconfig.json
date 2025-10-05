@@ -1,8 +1,7 @@
 {
   "compilerOptions": {
     "target": "ES2015",
-    "module": "NodeNext",
-    "moduleResolution": "NodeNext",
+    "module": "commonjs",
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
@@ -13,6 +12,7 @@
       "@/*": ["./src/*"]
     }
   },
+  // "include": ["src/**/*"],
   "include": ["**/*.ts"],
   "exclude": ["node_modules"]
 }
