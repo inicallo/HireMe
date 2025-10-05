@@ -106,6 +106,10 @@ export default class App {
     this.app.use('/api/analytics', analyticsRouter.getRouter());
   }
 
+  public getApp(): Express {
+    return this.app;
+  }
+
   public start(): void {
     this.app.listen(PORT, () => {
       console.log(`  ➜  [API] Local:   http://localhost:${PORT}/api`);
