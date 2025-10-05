@@ -8,173 +8,97 @@ import {
   deleteSubsType,
 } from '@/lib/substype';
 import { ISubsType } from '@/types/substype';
-// Import interfaces
 import { toast } from 'react-toastify';
-import { jwtDecode } from 'jwt-decode'; // Ensure this is installed
-import { DecodedToken, IUserProfile } from '@/types/iuser';
+import { jwtDecode } from 'jwt-decode';
+import { DecodedToken } from '@/types/iuser';
 import { getToken } from '@/lib/server';
 import Card from './components/cardsub';
 
 const SubsManage: React.FC = () => {
   const [plans, setPlans] = useState<ISubsType[]>([]);
   const [isEditingAll, setIsEditingAll] = useState(false);
-  const [userRole, setUserRole] = useState<IUserProfile['role'] | null>(null); // Use IUserProfile's role type
-
-  useEffect(() => {
-    const fetchUserRole = async () => {
-      try {
-        const token = await getToken(); // Retrieve token
-        if (!token) {
-          toast.error('No token found. Access denied.');
-          console.error('Token not found or is null.');
-          return;
-        }
-
-
-        try {
-          const decodedToken: DecodedToken = jwtDecode<DecodedToken>(token); // Decode token with updated interface
-
-          if (decodedToken.role) {
-            setUserRole(decodedToken.role); // Set the role
-          } else {
-            console.error('Role not found in decoded token.');
-            toast.error('Failed to retrieve user role from token.');
-          }
-        } catch (decodeError) {
-          console.error('Error decoding token:', decodeError);
-          toast.error('Invalid token. Failed to decode.');
-        }
-      } catch (error) {
-        console.error('Error retrieving token:', error); // Log specific errors
-        toast.error('Failed to verify user role.');
-      }
-    };
-
-    fetchUserRole();
-
-    const fetchPlans = async () => {
-      try {
-        const response = await getSubstypes();
-        if (
-          response.ok &&
-          response.substypes &&
-          Array.isArray(response.substypes.subscriptionstypeAll)
-        ) {
-          setPlans(response.substypes.subscriptionstypeAll);
-        } else {
-          console.error('Failed to fetch plans');
-          toast.error(
-            'Failed to fetch plans: Invalid data structure or empty response',
-          );
-        }
-      } catch (error) {
-        console.error('Error fetching plans:', error);
-        toast.error(
-          `Failed to fetch plans: ${error instanceof Error ? error.message : 'Unknown error occurred'}`,
-        );
-      }
-    };
-
-    fetchPlans();
-  }, []);
-
-  const handlePlanChange = async (id: number, name: string, value: any) => {
-    const updatedPlans = plans.map((plan) =>
-      plan.subs_type_id === id ? { ...plan, [name]: value } : plan,
-    );
-    setPlans(updatedPlans);
-
-    const updatedPlan = updatedPlans.find((plan) => plan.subs_type_id === id);
-
-    if (updatedPlan) {
-      try {
-        const response = await updateSubsType(id, updatedPlan);
-        if (response.ok) {
-          toast.success('Plan updated successfully');
-        } else {
-          console.error('Failed to update plan on backend:', response.error);
-          toast.error('Failed to update plan: Invalid response from server');
-        }
-      } catch (error) {
-        console.error('Error updating plan:', error);
-        toast.error(
-          `Failed to update plan: ${error instanceof Error ? error.message : 'Unknown error occurred'}`,
-        );
-      }
-    }
-  };
+  const [userRole, setUserRole] = useState<DecodedToken['role'] | null>(null);
 
   const fetchPlans = async () => {
     try {
       const response = await getSubstypes();
-      if (
-        response.ok &&
-        response.substypes &&
-        Array.isArray(response.substypes.subscriptionstypeAll)
-      ) {
+      if (response.ok && response.substypes?.subscriptionstypeAll) {
         setPlans(response.substypes.subscriptionstypeAll);
       } else {
-        console.error('Failed to fetch plans');
-        toast.error(
-          'Failed to fetch plans: Invalid data structure or empty response',
-        );
+        toast.error('Failed to fetch plans.');
       }
     } catch (error) {
-      console.error('Error fetching plans:', error);
-      toast.error(
-        `Failed to fetch plans: ${error instanceof Error ? error.message : 'Unknown error occurred'}`,
-      );
+      toast.error(`Failed to fetch plans: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   };
 
   useEffect(() => {
-    fetchPlans(); // Fetch plans on component mount
+    const fetchUserRole = async () => {
+      try {
+        const token = await getToken();
+        if (!token) return;
+        const decodedToken = jwtDecode<DecodedToken>(token);
+        setUserRole(decodedToken.role);
+      } catch (error) {
+        console.error('Failed to decode token:', error);
+      }
+    };
+    fetchUserRole();
+    fetchPlans();
   }, []);
 
+  // CORRECTED: This function now handles individual field changes and syncs with the backend
+  const handlePlanChange = async (id: string, name: string, value: any) => {
+    // Optimistically update the UI
+    setPlans(currentPlans =>
+      currentPlans.map(plan =>
+        plan.subs_type_id === id ? { ...plan, [name]: value } : plan
+      )
+    );
+
+    // Debounce or save logic can go here, for now we save immediately
+    try {
+      const response = await updateSubsType(id, { [name]: value });
+      if (!response.ok) {
+        toast.error(response.error || 'Failed to update plan.');
+        fetchPlans(); // Revert on failure
+      } else {
+        toast.success(`Plan ${name} updated!`);
+      }
+    } catch (error) {
+      toast.error(`Failed to update plan: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      fetchPlans(); // Revert on failure
+    }
+  };
+  
   const handleAddPlan = async () => {
-    const newPlan: ISubsType = {
-      subs_type_id: plans.length + 1,
-      type: 'NEW PLAN',
-      description: '',
+    const newPlanData = {
+      type: 'New Plan',
+      description: 'Add a description',
       price: 0,
-      features: [],
+      features: ['New Feature'],
       is_recomend: false,
     };
 
     try {
-      const response = await createSubsType(newPlan);
-      if (response.ok && response.data) {
-        setPlans([
-          ...plans,
-          { ...response.data, features: response.data.features || [] },
-        ]);
+      const response = await createSubsType(newPlanData);
+      if (response.ok) {
         toast.success('New plan created successfully');
-
-        setTimeout(() => {
-          fetchPlans();
-        }, 1000);
+        fetchPlans();
       } else {
-        console.error('Failed to create plan');
-        toast.error('Failed to create new plan: Invalid response from server');
+        toast.error(response.error || 'Failed to create new plan.');
       }
     } catch (error) {
-      console.error('Error creating plan:', error);
-      toast.error(
-        `Failed to create new plan: ${error instanceof Error ? error.message : 'Unknown error occurred'}`,
-      );
+      toast.error(`Failed to create new plan: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   };
 
-  const handleDeletePlan = async (id: number) => {
+  const handleDeletePlan = async (id: string) => {
     if (userRole !== 'developer') {
       toast.error('You do not have permission to delete plans.');
       return;
     }
-
-    const confirmDelete = window.confirm(
-      'Are you sure you want to delete this plan?',
-    );
-    if (!confirmDelete) return;
+    if (!window.confirm('Are you sure you want to delete this plan?')) return;
 
     try {
       const response = await deleteSubsType(id);
@@ -182,14 +106,10 @@ const SubsManage: React.FC = () => {
         setPlans(plans.filter((plan) => plan.subs_type_id !== id));
         toast.success('Plan deleted successfully');
       } else {
-        console.error('Failed to delete plan');
-        toast.error('Failed to delete plan: Invalid response from server');
+        toast.error(response.error || 'Failed to delete plan.');
       }
     } catch (error) {
-      console.error('Error deleting plan:', error);
-      toast.error(
-        `Failed to delete plan: ${error instanceof Error ? error.message : 'Unknown error occurred'}`,
-      );
+      toast.error(`Failed to delete plan: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   };
 
@@ -200,7 +120,7 @@ const SubsManage: React.FC = () => {
           Dev Subscription Setting
         </h1>
         <div className="flex justify-between mb-6">
-          <label className="flex cursor-pointer gap-2">
+          <label className="flex cursor-pointer gap-2 items-center">
             <span className="font-medium">View Mode</span>
             <input
               type="checkbox"
@@ -213,7 +133,7 @@ const SubsManage: React.FC = () => {
           {isEditingAll && userRole === 'developer' && (
             <button
               onClick={handleAddPlan}
-              className="bg-green-500 text-white py-2 px-4 rounded-lg"
+              className="bg-green-500 text-white py-2 px-4 rounded-lg hover:bg-green-600"
             >
               Add New Plan
             </button>
@@ -226,9 +146,7 @@ const SubsManage: React.FC = () => {
               plan={plan}
               onChange={handlePlanChange}
               isEditingAll={isEditingAll}
-              onRecommend={(id) =>
-                handlePlanChange(id, 'is_recomend', !plan.is_recomend)
-              }
+              onRecommend={(id) => handlePlanChange(id, 'is_recomend', !plan.is_recomend)}
               onDelete={handleDeletePlan}
               onToggleEdit={() => {}}
             />

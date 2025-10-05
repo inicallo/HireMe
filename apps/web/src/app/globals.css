@@ -71,9 +71,5 @@ a {
 }
 
 .form-checkbox {
-  @apply bg-white ;  
-}
-
-text {
-  @apply text-black;
+  @apply bg-white;
 }

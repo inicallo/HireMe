@@ -23,17 +23,12 @@ export default function RootLayout({
     <html lang="en">
       <body className={inter.className}>
         <StoreProvider>
+          <ToastContainer position="bottom-right" autoClose={2000} hideProgressBar />
           <div className="flex flex-col min-h-screen">
             <Navbar />
             <main className="flex-grow">{children}</main>
             <Footer />
           </div>
-            <ToastContainer
-              position="bottom-right"
-              autoClose={3000}
-              closeOnClick
-              draggable
-            />
         </StoreProvider>
       </body>
     </html>

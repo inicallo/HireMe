@@ -6,7 +6,7 @@ export class FavoriteJobController {
     try {
       const userId = req.user?.user_id;
       if (!userId) {
-        return res.status(400).json({ msg: 'User ID is required' });
+        return res.status(401).json({ msg: 'Unauthorized' });
       }
 
       const favorites = await prisma.favorite.findMany({
@@ -23,34 +23,39 @@ export class FavoriteJobController {
         favorites,
       });
     } catch (error) {
-      res.status(500).json({ msg: 'Failed to fetch favorite jobs' });
+      console.error('Failed to fetch favorite jobs:', error);
+      res.status(500).json({ msg: 'An error occurred while fetching favorite jobs' });
     }
   }
 
   async checkApplicationStatus(req: Request, res: Response) {
     try {
-      const jobIdString = req.query.jobId as string;
-      const jobId = parseInt(jobIdString, 10);
+      const { jobId } = req.query;
       const userId = req.user?.user_id;
 
       if (!userId) {
-        return res.status(400).json({ msg: 'User ID is required' });
+        return res.status(401).json({ msg: 'Unauthorized' });
       }
-      if (!jobIdString || isNaN(jobId)) {
-        return res.status(400).json({ msg: 'Invalid job ID' });
+
+      // --- FIX: Validate the jobId as a 24-character ObjectID string ---
+      const objectIdRegex = /^[0-9a-fA-F]{24}$/;
+      if (typeof jobId !== 'string' || !objectIdRegex.test(jobId)) {
+        return res.status(400).json({ msg: 'Invalid Job ID format' });
       }
+      // --- END FIX ---
 
       const existingApplication = await prisma.application.findFirst({
-        where: { user_id: userId, job_id: jobId },
+        where: { 
+          user_id: userId, 
+          job_id: jobId // Use the validated string directly
+        },
       });
 
-      if (existingApplication) {
-        return res.status(200).json({ applied: true });
-      } else {
-        return res.status(200).json({ applied: false });
-      }
+      res.status(200).json({ applied: !!existingApplication });
+      
     } catch (error) {
-      res.status(500).json({ msg: 'Failed to check application status' });
+      console.error('Failed to check application status:', error);
+      res.status(500).json({ msg: 'An error occurred while checking application status' });
     }
   }
 }

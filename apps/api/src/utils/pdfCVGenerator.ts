@@ -14,28 +14,30 @@ export const generatePdf = async (content: any): Promise<Buffer> => {
 
   doc.pipe(writable);
 
-  // Header: Nama Lengkap
+  // Header
   doc
     .fontSize(24)
     .font('Helvetica-Bold')
-    .text(content.fullName, { align: 'center' })
+    .text(content.fullName || 'Unnamed', { align: 'center' })
     .moveDown(0.5);
 
-  // Sub-header: Kontak Informasi
+  // Sub-header
   doc
     .fontSize(12)
     .font('Helvetica')
-    .text(`Email: ${content.email}`, { align: 'center' })
-    .text(`Phone: ${content.phone}`, { align: 'center' })
+    .text(`Email: ${content.email || ''}`, { align: 'center' })
+    .text(`Phone: ${content.phone || ''}`, { align: 'center' })
     .moveDown(1);
 
   // Summary Section
-  doc
-    .fontSize(16)
-    .font('Helvetica-Bold')
-    .text('Professional Summary', { underline: true })
-    .moveDown(0.5);
-  doc.fontSize(12).font('Helvetica').text(content.summary).moveDown(1);
+  if (content.summary) {
+    doc
+      .fontSize(16)
+      .font('Helvetica-Bold')
+      .text('Professional Summary', { underline: true })
+      .moveDown(0.5);
+    doc.fontSize(12).font('Helvetica').text(content.summary).moveDown(1);
+  }
 
   // Work Experience Section
   if (content.experiences && content.experiences.length > 0) {
@@ -45,7 +47,7 @@ export const generatePdf = async (content: any): Promise<Buffer> => {
       .text('Work Experience', { underline: true })
       .moveDown(0.5);
 
-    content.experiences.forEach((exp: any, index: number) => {
+    content.experiences.forEach((exp: any) => {
       doc
         .fontSize(12)
         .font('Helvetica-Bold')
@@ -69,6 +71,7 @@ export const generatePdf = async (content: any): Promise<Buffer> => {
     content.skills.forEach((skill: string) => {
       doc.fontSize(12).font('Helvetica').text(`- ${skill}`).moveDown(0.2);
     });
+    doc.moveDown(1);
   }
 
   // Education Section
@@ -88,11 +91,10 @@ export const generatePdf = async (content: any): Promise<Buffer> => {
     });
   }
 
-  // End document
   doc.end();
 
   return new Promise((resolve, reject) => {
-    writable.on('finish', () => resolve(Buffer.concat(buffers)));
+    writable.on('finish', () => resolve(Buffer.concat(buffers as Uint8Array[])));
     writable.on('error', reject);
   });
 };

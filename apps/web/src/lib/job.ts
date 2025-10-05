@@ -149,3 +149,22 @@ export const fetchRecentlyPostedJobs = async (userId: number) => {
     return { jobs: [], ok: false };
   }
 };
+
+export const fetchTotalApplicantsCount = async (userId: string) => {
+  try {
+    const token = await getToken();
+    const response = await fetch(`${base_url}/jobs/applicants/count`, { // We will create this backend endpoint next
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    if (!response.ok) {
+      throw new Error('Failed to fetch applicants count');
+    }
+    const data = await response.json();
+    return { ok: true, count: data.count };
+  } catch (error) {
+    console.error(error);
+    return { ok: false, count: 0 };
+  }
+};

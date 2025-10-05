@@ -13,12 +13,16 @@ import { useSearchParams } from 'next/navigation';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import ViewAllJobsPosted from './components/VIewAllJobs';
 import SettingsTab from './components/SettingAccount';
+import PreAssessmentManage from './components/PreAssessmentManage';
 
 const AdminDashboard = () => {
   const searchParams = useSearchParams();
   const initialTab = searchParams.get('tab') || 'overview';
   const [selectedTab, setSelectedTab] = useState(initialTab);
   const [userName, setUserName] = useState('');
+
+  const jobId = searchParams.get('jobId');
+  const jobTitle = searchParams.get('jobTitle');
 
   useEffect(() => {
     const fetchData = async () => {
@@ -60,6 +64,8 @@ const AdminDashboard = () => {
         return <OverviewTab setSelectedTab={setSelectedTab} />;
       case 'ViewAllJobsPosted':
         return <ViewAllJobsPosted />;
+      case 'PreAssessmentManage':
+        return <PreAssessmentManage jobId={jobId} jobTitle={jobTitle} />;
       case 'SettingCompany':
         return <CompanySettings />;
       case 'accountSettings':

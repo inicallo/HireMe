@@ -1,9 +1,10 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 
+// ✅ CORRECTED: Changed ID types from number to string
 interface DecodedToken {
-  user_id: number;
-  assessment_id: number;
+  user_id: string;
+  assessment_id: string;
   role: string;
   iat: number;
   exp: number;
@@ -27,6 +28,7 @@ export const verifyAssessmentToken = (
 
     const decoded = jwt.verify(token, process.env.SECRET_JWT!) as DecodedToken;
 
+    // This will now work because the types match custom.d.ts
     req.user = {
       user_id: decoded.user_id,
       role: decoded.role,

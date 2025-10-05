@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import Link from 'next/link';
-import { ToastContainer, toast } from 'react-toastify';
+import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Cookies from 'js-cookie';
 import {
@@ -130,7 +130,7 @@ export default function JobForm() {
         <h2 className="text-2xl font-bold text-green-500 mb-4">
           Job Created Successfully!
         </h2>
-        <Link href="/company-jobs" legacyBehavior>
+        <Link href="/my-jobs" legacyBehavior>
           <a className="bg-blue-500 text-white px-4 py-2 rounded-lg">
             Go Back to Job List
           </a>

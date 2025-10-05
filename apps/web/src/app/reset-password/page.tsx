@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { FaEye, FaEyeSlash } from 'react-icons/fa';
-import { toast, ToastContainer } from 'react-toastify';
+import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { resetPassword } from '@/services/passwordService';
 
@@ -53,7 +53,6 @@ const ResetPassword = () => {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-white">
-      <ToastContainer position="bottom-right" autoClose={3000} hideProgressBar />
       <div className="max-w-md w-full text-center m-6 mt-[-80px] lg:mt-[-280px] md:mt-[-280px]">
         <h2 className="text-3xl font-semibold mb-4">Reset Password</h2>
         <p className="text-gray-600 mb-8">

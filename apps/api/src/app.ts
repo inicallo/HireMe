@@ -1,5 +1,3 @@
-// api/src/app.ts
-
 import express, {
   json,
   urlencoded,
@@ -20,14 +18,13 @@ import { NotificationRouter } from './routers/notification.router';
 import { ApplicationRouter } from './routers/application.router';
 import { FavoriteJobRouter } from './routers/favoriteJob.router';
 import { CompanyRouter } from './routers/company.router';
-import { PreSelectionTestRouter } from './routers/preselection.router';
 import { AnalyticsRouter } from './routers/analytic.router';
 import { base_fe_url } from './controllers/user.controller';
 import { CvRouter } from './routers/cv.router';
 import { PlanBillRouter } from './routers/userplan.router';
 import { AssessmentRouter } from './routers/assessment.router';
 import { CertificateRouter } from './routers/certificate.router';
-
+import { PreSelectionTestRouter } from './routers/preselection.router';
 export default class App {
   private app: Express;
 
@@ -42,7 +39,6 @@ export default class App {
     this.app.use(cors({ origin: `${base_fe_url}`, credentials: true }));
     this.app.use(json());
     this.app.use(urlencoded({ extended: true }));
-    this.app.use('/api/public', express.static('public'));
   }
 
   private handleError(): void {
@@ -115,12 +111,4 @@ export default class App {
       console.log(`  ➜  [API] Local:   http://localhost:${PORT}/api`);
     });
   }
-  
-  public getApp(): Express {
-    return this.app;
-  }
 }
-
-const appInstance = new App().getApp();
-
-export { appInstance };

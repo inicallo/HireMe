@@ -7,7 +7,6 @@ import {
   FiCreditCard,
   FiFileText,
 } from 'react-icons/fi';
-import { PiCertificate } from 'react-icons/pi';
 import { GrCertificate } from 'react-icons/gr';
 
 interface SidebarProps {

@@ -24,7 +24,13 @@ const CompanyCard: React.FC<CompanyCardProps> = ({ company }) => (
       )}
       <div className="flex-1">
         <h3 className="text-lg font-semibold text-gray-800">{company.company_name}</h3>
-        <p className="text-sm text-gray-500">{company.IndustryType}</p>
+        <p className="text-sm text-gray-500">
+          {company.IndustryType
+            ? company.IndustryType.split(' ')
+          .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+          .join(' ')
+            : ''}
+        </p>    
       </div>
     </div>
     <Link href={`/company-page/${company.company_id}`}>

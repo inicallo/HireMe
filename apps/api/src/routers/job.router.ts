@@ -20,6 +20,7 @@ export class JobRouter {
   this.router.post('/favorites/toggle', verifyToken, checkCandidate, this.jobController.toggleSaveJob);
   this.router.get('/recently-posted/:userId', verifyToken, checkAdminDev, this.jobController.getRecentlyPostedJobs);
   this.router.get('/total-jobs-count/:userId', verifyToken, this.jobController.getTotalJobsCount);
+  this.router.get('/applicants/count', verifyToken, checkAdminDev, this.jobController.getTotalApplicantsCount);
   
   this.router.get('/', this.jobController.getJobs);
   this.router.get('/:id', this.jobController.getJobById);

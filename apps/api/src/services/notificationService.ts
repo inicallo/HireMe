@@ -15,11 +15,11 @@ export async function sendNotification({
   relatedId,
   link,
 }: {
-  userId: number;
+  userId: string;
   subject: string;
   message: string;
   type: NotificationType;
-  relatedId?: number;
+  relatedId?: string;
   link?: string;
 }) {
   await prisma.notification.create({
@@ -36,8 +36,9 @@ export async function sendNotification({
 }
 
 export async function notifyApplicationStatusChange(
-  userId: number,
-  applicationId: number,
+  // CORRECTED: Changed ID types to string
+  userId: string,
+  applicationId: string,
   currentStatus: string,
   newStatus: string
 ) {
@@ -89,8 +90,9 @@ export async function notifyApplicationStatusChange(
 }
 
 export async function sendApplicationStatusNotification(
-  userId: number,
-  applicationId: number,
+  // CORRECTED: Changed ID types to string
+  userId: string,
+  applicationId: string,
   status: string
 ) {
   const application = await prisma.application.findUnique({
@@ -139,8 +141,9 @@ export async function sendApplicationStatusNotification(
 }
 
 export async function createInterviewNotification(
-  interviewId: number,
-  userId: number,
+  // CORRECTED: Changed ID types to string
+  interviewId: string,
+  userId: string,
   status: string
 ) {
   const interview = await prisma.interview.findUnique({

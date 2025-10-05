@@ -1,7 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { PrismaClient } from "@prisma/client";
-
-const prisma = new PrismaClient();
+import prisma from "@/prisma"; // ✅ USE the shared prisma client
 
 export const checkActiveSubscription = async (req: Request, res: Response, next: NextFunction) => {
   try {
@@ -10,13 +8,13 @@ export const checkActiveSubscription = async (req: Request, res: Response, next:
       return res.status(401).json({ message: "Unauthorized: No user ID found in request." });
     }
 
-    // Cari subscription dengan status 'active'
     const activeSubscription = await prisma.subscription.findFirst({
       where: {
         user_id: userId,
-        status: "active", // Pastikan hanya subscription aktif yang diterima
+        status: "active",
       },
     });
+
     if (!activeSubscription) {
       return res.status(403).json({
         message: "Access denied: No active subscription found.",
@@ -24,38 +22,28 @@ export const checkActiveSubscription = async (req: Request, res: Response, next:
       });
     }
 
-    // Jika subscription aktif, lanjutkan ke fitur berikutnya
     next();
   } catch (error: unknown) {
-    if (error instanceof Error) {
-      console.error("Error checking active subscription:", error.message);
-      res.status(500).json({ message: "Internal server error", detail: error.message });
-    } else {
-      console.error("Unexpected error:", error);
-      res.status(500).json({ message: "Internal server error", detail: "An unknown error occurred." });
-    }
+    const message = error instanceof Error ? error.message : "An unknown error occurred.";
+    console.error("Error checking active subscription:", message);
+    res.status(500).json({ message: "Internal server error", detail: message });
   }
-  
 };
-
-
-
 
 export const checkFeatureLimit = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const userId = req.user?.user_id; // Pastikan Anda memiliki mekanisme auth untuk mendapatkan userId dari token
+    const userId = req.user?.user_id;
     if (!userId) {
       return res.status(401).json({ message: "Unauthorized" });
     }
 
-    // Cari subscription aktif untuk user
     const subscription = await prisma.subscription.findFirst({
       where: {
         user_id: userId,
         status: "active",
       },
       include: {
-        subscriptionType: true, // Pastikan model SubscriptionType memiliki informasi plan
+        subscriptionType: true,
       },
     });
 
@@ -65,14 +53,13 @@ export const checkFeatureLimit = async (req: Request, res: Response, next: NextF
       });
     }
 
-    const { type } = subscription.subscriptionType; // Misalnya: "Standar", "Profesional"
+    const { type } = subscription.subscriptionType;
 
     if (type === "STANDARD") {
-      // Periksa jumlah penggunaan fitur
       const featureUsage = await prisma.featureUsage.count({
         where: {
           user_id: userId,
-          feature_name: "Skill Assessment", // Nama fitur
+          feature_name: "Skill Assessment",
         },
       });
 
@@ -82,7 +69,6 @@ export const checkFeatureLimit = async (req: Request, res: Response, next: NextF
         });
       }
 
-      // Catat penggunaan fitur
       await prisma.featureUsage.create({
         data: {
           user_id: userId,
@@ -91,7 +77,6 @@ export const checkFeatureLimit = async (req: Request, res: Response, next: NextF
       });
     }
 
-    // Jika plan Profesional, lanjutkan tanpa batasan
     next();
   } catch (error) {
     console.error("Error checking feature limit:", error);

@@ -3,16 +3,16 @@ import { Question } from '@/types/assessment';
 
 type AssessmentCardProps = {
   questions: Question[];
-  onSubmit: (responses: { question_id: number; answer_id: number; answer_text: string }[]) => void;
+  onSubmit: (responses: { question_id: string; answer_id: string; answer_text: string }[]) => void;
   loading: boolean;
 };
 
 const AssessmentCard: React.FC<AssessmentCardProps> = ({ questions, onSubmit, loading }) => {
   const [responses, setResponses] = useState<
-    { question_id: number; answer_id: number; answer_text: string }[]
+    { question_id: string; answer_id: string; answer_text: string }[]
   >([]);
 
-  const handleAnswer = (question_id: number, answer_id: number, answer_text: string) => {
+  const handleAnswer = (question_id: string, answer_id: string, answer_text: string) => {
     setResponses((prev) => [
       ...prev.filter((res) => res.question_id !== question_id),
       { question_id, answer_id, answer_text },
@@ -48,7 +48,11 @@ const AssessmentCard: React.FC<AssessmentCardProps> = ({ questions, onSubmit, lo
                     type="radio"
                     name={`question_${question.question_id}`}
                     onChange={() =>
-                      handleAnswer(question.question_id, answer.answer_id, answer.answer_text)
+                      handleAnswer(
+                        String(question.question_id),
+                        String(answer.answer_id),
+                        String(answer.answer_text)
+                      )
                     }
                     className="mr-3 h-4 w-4 text-blue-500 border-gray-300 focus:ring-blue-500"
                   />

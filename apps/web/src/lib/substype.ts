@@ -19,75 +19,21 @@ export const getSubstypes = async (): Promise<{
       throw new Error('Network response was not ok');
     }
     const data: SubstypeResponse = await response.json();
-
     return { substypes: data, ok: true };
   } catch (error) {
     console.error('Error fetching substypes:', error);
-
     return { substypes: null, ok: false };
   }
 };
 
-export const getSubstypeById = async (
-  id: string,
-): Promise<{ substype: ISubsType | null; ok: boolean }> => {
-  try {
-    const res = await fetch(`${base_url}/plans/${id}`);
-    if (!res.ok) {
-      throw new Error('Failed to fetch subs type by ID');
-    }
-
-    const result: ISubsType = await res.json();
-
-    return { substype: result, ok: true };
-  } catch (error) {
-    console.error('Error fetching substype by ID:', error);
-    return { substype: null, ok: false };
-  }
-};
-
-export const updateSubsType = async (
-  subs_type_id: number,
-  updatedSubsType: ISubsType,
-): Promise<{ data?: any; error?: string; ok: boolean }> => {
-  try {
-    const token = await getToken();
-
-    const response = await fetch(`${base_url}/plans/update/${subs_type_id}`, {
-      method: 'PUT',
-      headers: {
-        Authorization: `Bearer ${token}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(updatedSubsType),
-    });
-
-    const result = await response.json();
-
-    return {
-      ok: response.ok,
-      data: result.data,
-      error: result.error || result.message || 'Unknown error occurred',
-    };
-  } catch (error) {
-    console.error('Error in updateSubsType:', error);
-
-    return {
-      ok: false,
-      error:
-        error instanceof Error
-          ? error.message
-          : 'Network error or server unavailable',
-    };
-  }
-};
+type CreateSubsTypeInput = Omit<ISubsType, 'subs_type_id'>;
 
 export const createSubsType = async (
-  newSubsType: ISubsType,
+  newSubsType: CreateSubsTypeInput,
 ): Promise<{ data?: any; error?: string; ok: boolean }> => {
   try {
     const token = await getToken();
-    const response = await fetch(`${base_url}/plans/create`, {
+    const response = await fetch(`${base_url}/plans`, { // Corrected endpoint
       method: 'POST',
       headers: {
         Authorization: `Bearer ${token}`,
@@ -96,14 +42,12 @@ export const createSubsType = async (
       body: JSON.stringify(newSubsType),
     });
 
-    if (!response.ok) {
-      throw new Error('Failed to create new subs type');
-    }
-
     const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data.msg || 'Failed to create new subs type');
+    }
     return { data, ok: true };
   } catch (error) {
-    console.error('Error creating subs type:', error);
     return {
       error: error instanceof Error ? error.message : 'Unknown error occurred',
       ok: false,
@@ -111,26 +55,53 @@ export const createSubsType = async (
   }
 };
 
-export const deleteSubsType = async (
-  subs_type_id: number,
-): Promise<{ error?: string; ok: boolean }> => {
+export const updateSubsType = async (
+  subs_type_id: string,
+  updatedSubsType: Partial<ISubsType>, // Use Partial<> for updates
+): Promise<{ data?: any; error?: string; ok: boolean }> => {
   try {
     const token = await getToken();
-    const response = await fetch(`${base_url}/plans/delete/${subs_type_id}`, {
-      method: 'DELETE',
+    const response = await fetch(`${base_url}/plans/${subs_type_id}`, { // ✅ CORRECTED: URL path is now correct
+      method: 'PATCH', // ✅ CORRECTED: Use PATCH for partial updates
       headers: {
         Authorization: `Bearer ${token}`,
         'Content-Type': 'application/json',
       },
+      body: JSON.stringify(updatedSubsType),
+    });
+
+    const result = await response.json();
+    if (!response.ok) {
+      throw new Error(result.msg || 'Unknown error occurred');
+    }
+    return { ok: true, data: result };
+  } catch (error) {
+    console.error('Error in updateSubsType:', error);
+    return {
+      ok: false,
+      error: error instanceof Error ? error.message : 'Network error or server unavailable',
+    };
+  }
+};
+
+export const deleteSubsType = async (
+  subs_type_id: string, // id is a string
+): Promise<{ error?: string; ok: boolean }> => {
+  try {
+    const token = await getToken();
+    const response = await fetch(`${base_url}/plans/${subs_type_id}`, { // Corrected endpoint
+      method: 'DELETE',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
     });
 
     if (!response.ok) {
-      throw new Error('Failed to delete subs type');
+      const data = await response.json();
+      throw new Error(data.msg || 'Failed to delete subs type');
     }
-
     return { ok: true };
   } catch (error) {
-    console.error('Error deleting subs type:', error);
     return {
       error: error instanceof Error ? error.message : 'Unknown error occurred',
       ok: false,

@@ -119,3 +119,11 @@ export const updateCompany = async (companyId: string, data: FormData): Promise<
     return { company: null, ok: false };
   }
 };
+
+export async function fetchCompanyById(companyId: string) {
+  const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_API_URL}/api/companies/${companyId}`);
+  if (!response.ok) {
+    throw new Error('Failed to fetch company details');
+  }
+  return response.json();
+}

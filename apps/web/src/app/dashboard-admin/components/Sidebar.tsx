@@ -1,4 +1,12 @@
-import { FiHome, FiFileText, FiBriefcase, FiSettings, FiCreditCard, FiUser } from 'react-icons/fi';
+import {
+  FiHome,
+  FiFileText,
+  FiBriefcase,
+  FiSettings,
+  FiCreditCard,
+  FiUser,
+} from 'react-icons/fi';
+import { FaBook } from 'react-icons/fa';
 
 interface SidebarProps {
   selectedTab: string;
@@ -19,6 +27,12 @@ const Sidebar = ({ selectedTab, setSelectedTab }: SidebarProps) => (
         onClick={() => setSelectedTab('ViewAllJobsPosted')}
       >
         <FiBriefcase size={20} className="mr-2" /> All Jobs
+      </li>
+      <li
+        className={`flex items-center cursor-pointer whitespace-nowrap ${selectedTab === 'PreAssessmentManage' ? 'text-blue-500 font-semibold' : ''}`}
+        onClick={() => setSelectedTab('PreAssessmentManage')}
+      >
+        <FaBook size={20} className="mr-2" /> PreAssessment
       </li>
       <li
         className={`flex items-center cursor-pointer whitespace-nowrap ${selectedTab === 'SettingCompany' ? 'text-blue-500 font-semibold' : ''}`}

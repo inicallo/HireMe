@@ -1,12 +1,9 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "mysql"
+  provider = "mongodb"
   url      = env("DATABASE_URL")
 }
 
@@ -229,7 +226,7 @@ enum IndustryType {
 
 // User model
 model User {
-  user_id             Int             @id @default(autoincrement())
+  user_id             String          @id @default(auto()) @map("_id") @db.ObjectId
   email               String          @unique
   password            String
   role                UserRole
@@ -245,7 +242,7 @@ model User {
   instagram           String?
   title               String?
   education           EducationLevel?
-  biography           String?         @db.Text()
+  biography           String?
   skills              String?
   languages           String?
   nationality         String?
@@ -262,7 +259,8 @@ model User {
 
   // Relations
   applications            Application[]
-  companies               Company[]                @relation("UserCompanies")
+  companies               Company[]                @relation("UserCompanies", fields: [company_ids], references: [company_id])
+  company_ids             String[] @db.ObjectId
   skillAssessments        SkillAssessment[]
   reviews                 Review[]
   notifications           Notification[]
@@ -282,17 +280,15 @@ model User {
   featureUsage            FeatureUsage[]
   SubscriptionType        SubscriptionType[]
   UserAssessmentScore     UserAssessmentScore[]
-
-  @@index([email])
 }
 
 // Company model
 model Company {
-  company_id      Int           @id @default(autoincrement())
+  company_id      String        @id @default(auto()) @map("_id") @db.ObjectId
   company_name    String
   email           String        @unique
   phone           String?
-  aboutUs         String?       @db.Text()
+  aboutUs         String?
   website         String?
   linkedin        String?
   instagram       String?
@@ -305,24 +301,23 @@ model Company {
   address         String?
   created_at      DateTime      @default(now())
   updated_at      DateTime      @updatedAt
-  description     String?       @db.Text()
+  description     String?
   logo            String?
   banner          String?
 
   // Relations
   jobs    Job[]
   reviews Review[]
-  users   User[]   @relation("UserCompanies")
-
-  @@index([email])
+  users   User[]   @relation("UserCompanies", fields: [user_ids], references: [user_id])
+  user_ids String[] @db.ObjectId
 }
 
 // Job model
 model Job {
-  job_id            Int                @id @default(autoincrement())
+  job_id            String             @id @default(auto()) @map("_id") @db.ObjectId
   job_title         String
-  description       String             @db.Text()
-  responsibility    String?            @db.Text()
+  description       String
+  responsibility    String?
   country           CountryCode
   location          String?
   salary            Int?
@@ -337,13 +332,13 @@ model Job {
 
   // Relations
   company          Company           @relation(fields: [company_id], references: [company_id])
-  company_id       Int
+  company_id       String            @db.ObjectId
   applications     Application[]
   jobReports       JobReport[]
   jobViews         JobView[]
   jobSaves         JobSave[]
   user             User?             @relation(fields: [user_id], references: [user_id])
-  user_id          Int?
+  user_id          String?           @db.ObjectId
   Favorite         Favorite[]
   preSelectionTest PreSelectionTest?
   testResults      TestResult[]
@@ -354,9 +349,9 @@ model Job {
 }
 
 model Favorite {
-  id         Int      @id @default(autoincrement())
-  user_id    Int
-  job_id     Int
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  user_id    String   @db.ObjectId
+  job_id     String   @db.ObjectId
   created_at DateTime @default(now())
 
   user User @relation(fields: [user_id], references: [user_id])
@@ -367,10 +362,10 @@ model Favorite {
 
 // Application model
 model Application {
-  application_id   Int               @id @default(autoincrement())
+  application_id   String            @id @default(auto()) @map("_id") @db.ObjectId
   resume           String?
-  coverLetter      String?           @db.Text()
-  expected_salary  Decimal?
+  coverLetter      String?
+  expected_salary  Float?
   status           ApplicationStatus
   applied_at       DateTime          @default(now())
   updated_at       DateTime          @updatedAt
@@ -380,9 +375,9 @@ model Application {
 
   // Relations
   job       Job         @relation(fields: [job_id], references: [job_id])
-  job_id    Int
+  job_id    String      @db.ObjectId
   user      User        @relation(fields: [user_id], references: [user_id])
-  user_id   Int
+  user_id   String      @db.ObjectId
   interview Interview[]
 
   @@index([job_id])
@@ -391,14 +386,14 @@ model Application {
 
 // Notification model
 model Notification {
-  notification_id Int              @id @default(autoincrement())
+  notification_id String           @id @default(auto()) @map("_id") @db.ObjectId
   user            User             @relation(fields: [user_id], references: [user_id])
-  user_id         Int
+  user_id         String           @db.ObjectId
   subject         String?
   message         String
   is_read         Boolean
   type            NotificationType
-  related_id      Int?
+  related_id      String?
   link            String?
   created_at      DateTime         @default(now())
   updated_at      DateTime         @updatedAt
@@ -408,9 +403,9 @@ model Notification {
 
 // UserSkill model
 model UserSkill {
-  user_skill_id       Int               @id @default(autoincrement())
+  user_skill_id       String            @id @default(auto()) @map("_id") @db.ObjectId
   user                User              @relation(fields: [user_id], references: [user_id])
-  user_id             Int
+  user_id             String            @db.ObjectId
   skill_name          String
   years_of_experience Int?
   proficiency_level   ProficiencyLevel?
@@ -425,28 +420,28 @@ model UserSkill {
 
 // AdminLog model
 model AdminLog {
-  log_id           Int        @id @default(autoincrement())
+  log_id           String     @id @default(auto()) @map("_id") @db.ObjectId
   action           String
   timestamp        DateTime   @default(now())
   details          String?
   ip_address       String?
   user_agent       String?
   status           LogStatus?
-  affected_user_id Int?
+  affected_user_id String?
   admin            User       @relation(fields: [admin_id], references: [user_id])
-  admin_id         Int
-  affected_job_id  Int?
+  admin_id         String     @db.ObjectId
+  affected_job_id  String?
 
   @@index([admin_id])
 }
 
 // JobReport model
 model JobReport {
-  report_id       Int          @id @default(autoincrement())
+  report_id       String       @id @default(auto()) @map("_id") @db.ObjectId
   job             Job          @relation(fields: [job_id], references: [job_id])
-  job_id          Int
+  job_id          String       @db.ObjectId
   user            User         @relation(fields: [user_id], references: [user_id])
-  user_id         Int
+  user_id         String       @db.ObjectId
   reason          String
   status          ReportStatus
   admin_response  String?
@@ -461,11 +456,11 @@ model JobReport {
 
 // JobView model
 model JobView {
-  view_id     Int         @id @default(autoincrement())
+  view_id     String      @id @default(auto()) @map("_id") @db.ObjectId
   job         Job         @relation(fields: [job_id], references: [job_id])
-  job_id      Int
+  job_id      String      @db.ObjectId
   user        User?       @relation(fields: [user_id], references: [user_id])
-  user_id     Int?
+  user_id     String?     @db.ObjectId
   viewed_at   DateTime    @default(now())
   ip_address  String?
   user_agent  String?
@@ -479,11 +474,11 @@ model JobView {
 
 // JobSave model
 model JobSave {
-  save_id         Int       @id @default(autoincrement())
+  save_id         String    @id @default(auto()) @map("_id") @db.ObjectId
   job             Job       @relation(fields: [job_id], references: [job_id])
-  job_id          Int
+  job_id          String    @db.ObjectId
   user            User      @relation(fields: [user_id], references: [user_id])
-  user_id         Int
+  user_id         String    @db.ObjectId
   saved_at        DateTime  @default(now())
   is_favorite     Boolean
   notes           String?
@@ -498,12 +493,12 @@ model JobSave {
 
 // Interview model
 model Interview {
-  interview_id     Int             @id @default(autoincrement())
+  interview_id     String          @id @default(auto()) @map("_id") @db.ObjectId
   application      Application     @relation(fields: [application_id], references: [application_id])
-  application_id   Int
+  application_id   String          @db.ObjectId
   scheduled_time   DateTime
   status           InterviewStatus
-  feedback         String?         @db.Text()
+  feedback         String?
   interviewer_name String?
   interview_link   String?
   interview_type   InterviewType?
@@ -514,16 +509,18 @@ model Interview {
 }
 
 model PreSelectionTest {
-  test_id   Int            @id @default(autoincrement())
-  job_id    Int            @unique
+  test_id   String         @id @default(auto()) @map("_id") @db.ObjectId
+  job_id    String         @unique @db.ObjectId
   questions TestQuestion[]
   answers   TestAnswer[]
   job       Job            @relation(fields: [job_id], references: [job_id])
+  skillAssessment SkillAssessment @relation(fields: [assessment_id], references: [assessment_id])
+  assessment_id   String          @db.ObjectId
 }
 
 model TestQuestion {
-  question_id      Int              @id @default(autoincrement())
-  test_id          Int
+  question_id      String           @id @default(auto()) @map("_id") @db.ObjectId
+  test_id          String           @db.ObjectId
   question_text    String
   options          TestOption[]
   correct_answer   Int
@@ -532,9 +529,9 @@ model TestQuestion {
 }
 
 model TestResult {
-  result_id    Int      @id @default(autoincrement())
-  user_id      Int
-  job_id       Int
+  result_id    String   @id @default(auto()) @map("_id") @db.ObjectId
+  user_id      String   @db.ObjectId
+  job_id       String   @db.ObjectId
   score        Int
   completed_at DateTime @default(now())
   job          Job      @relation(fields: [job_id], references: [job_id])
@@ -542,17 +539,17 @@ model TestResult {
 }
 
 model TestOption {
-  option_id    Int          @id @default(autoincrement())
-  question_id  Int
+  option_id    String       @id @default(auto()) @map("_id") @db.ObjectId
+  question_id  String       @db.ObjectId
   option_text  String
   testQuestion TestQuestion @relation(fields: [question_id], references: [question_id])
 }
 
 model TestAnswer {
-  answer_id       Int      @id @default(autoincrement())
-  user_id         Int
-  question_id     Int
-  test_id         Int
+  answer_id       String           @id @default(auto()) @map("_id") @db.ObjectId
+  user_id         String           @db.ObjectId
+  question_id     String           @db.ObjectId
+  test_id         String           @db.ObjectId
   selected_option Int
   is_correct      Boolean
   answered_at     DateTime @default(now())
@@ -563,12 +560,12 @@ model TestAnswer {
 }
 
 model SubscriptionType {
-  subs_type_id       Int                  @id @default(autoincrement())
+  subs_type_id       String               @id @default(auto()) @map("_id") @db.ObjectId
   type               String
   description        String
-  price              Decimal
+  price              Float
   features           Json
-  User_id            Int?
+  User_id            String?              @db.ObjectId
   is_recomend        Boolean              @default(false)
   PaymentTransaction PaymentTransaction[]
   subscriptions      Subscription[]
@@ -578,16 +575,16 @@ model SubscriptionType {
 }
 
 model Subscription {
-  subscription_id      Int                  @id @default(autoincrement())
+  subscription_id      String               @id @default(auto()) @map("_id") @db.ObjectId
   start_date           DateTime?
   end_date             DateTime?
   status               SubscriptionStatus?
   payment_proof        Boolean?
   created_at           DateTime             @default(now())
   updated_at           DateTime             @updatedAt
-  amount               Decimal?
-  user_id              Int?
-  subscription_type_id Int
+  amount               Float?
+  user_id              String?              @db.ObjectId
+  subscription_type_id String               @db.ObjectId
   paymentTransactions  PaymentTransaction[]
   subscriptionType     SubscriptionType     @relation(fields: [subscription_type_id], references: [subs_type_id])
   user                 User?                @relation(fields: [user_id], references: [user_id])
@@ -598,15 +595,15 @@ model Subscription {
 }
 
 model Review {
-  review_id                 Int      @id @default(autoincrement())
-  rating                    Decimal?
-  comment                   String?  @db.Text
+  review_id                 String   @id @default(auto()) @map("_id") @db.ObjectId
+  rating                    Float?
+  comment                   String?
   created_at                DateTime @default(now())
   updated_at                DateTime @updatedAt
-  salary_estimate           Decimal?
+  salary_estimate           Float?
   position                  String?
-  user_id                   Int
-  company_id                Int
+  user_id                   String   @db.ObjectId
+  company_id                String   @db.ObjectId
   careerOpportunitiesRating Int
   facilitiesRating          Int
   workCultureRating         Int
@@ -619,33 +616,34 @@ model Review {
 }
 
 model SkillAssessment {
-  assessment_id   Int       @id @default(autoincrement())
-  created_at      DateTime  @default(now())
-  updated_at      DateTime  @updatedAt
+  assessment_id   String                   @id @default(auto()) @map("_id") @db.ObjectId
+  created_at      DateTime                 @default(now())
+  updated_at      DateTime                 @updatedAt
   assessment_data Json?
   start_date      DateTime?
   feedback        String?
 
   // Relations
   user                 User                     @relation(fields: [user_id], references: [user_id])
-  user_id              Int
+  user_id              String                   @db.ObjectId
   questions            AssessmentQuestion[]
   userResponses        UserAssessmentResponse[]
   userAssessmentScores UserAssessmentScore[]
+  preSelectionTests    PreSelectionTest[]
 
   @@index([user_id])
 }
 
 model AssessmentQuestion {
-  question_id            Int                      @id @default(autoincrement())
-  question_text          String                   @db.Text
+  question_id            String                   @id @default(auto()) @map("_id") @db.ObjectId
+  question_text          String
   question_type          QuestionType             @default(multiple_choice)
   created_at             DateTime                 @default(now())
   updated_at             DateTime                 @updatedAt
   is_active              Boolean
   difficulty_level       DifficultyLevel?
   points                 Int?
-  assessment_id          Int
+  assessment_id          String                   @db.ObjectId
   answers                AssessmentAnswer[]
   skillAssessment        SkillAssessment          @relation(fields: [assessment_id], references: [assessment_id], onDelete: Cascade)
   UserAssessmentResponse UserAssessmentResponse[]
@@ -655,12 +653,12 @@ model AssessmentQuestion {
 }
 
 model AssessmentAnswer {
-  answer_id              Int                      @id @default(autoincrement())
+  answer_id              String                   @id @default(auto()) @map("_id") @db.ObjectId
   answer_text            String
   is_correct             Boolean?
   created_at             DateTime                 @default(now())
   updated_at             DateTime                 @updatedAt
-  question_id            Int
+  question_id            String                   @db.ObjectId
   question               AssessmentQuestion       @relation(fields: [question_id], references: [question_id], onDelete: Cascade)
   UserAssessmentResponse UserAssessmentResponse[]
   UserAssessmentScore    UserAssessmentScore[]
@@ -669,20 +667,20 @@ model AssessmentAnswer {
 }
 
 model UserAssessmentResponse {
-  response_id Int      @id @default(autoincrement())
-  answer_text String?  @db.Text()
-  created_at  DateTime @default(now())
-  updated_at  DateTime @updatedAt
+  response_id   String             @id @default(auto()) @map("_id") @db.ObjectId
+  answer_text   String?
+  created_at    DateTime @default(now())
+  updated_at    DateTime @updatedAt
 
   // Relations
   user            User               @relation(fields: [user_id], references: [user_id])
-  user_id         Int
+  user_id         String             @db.ObjectId
   question        AssessmentQuestion @relation(fields: [question_id], references: [question_id])
-  question_id     Int
+  question_id     String             @db.ObjectId
   answer          AssessmentAnswer?  @relation(fields: [answer_id], references: [answer_id])
-  answer_id       Int?
+  answer_id       String?            @db.ObjectId
   skillAssessment SkillAssessment    @relation(fields: [assessment_id], references: [assessment_id])
-  assessment_id   Int
+  assessment_id   String             @db.ObjectId
 
   @@index([user_id])
   @@index([question_id])
@@ -690,31 +688,31 @@ model UserAssessmentResponse {
 }
 
 model UserAssessmentScore {
-  score_id    Int              @id @default(autoincrement())
-  badge       String?
-  score       Int?             @default(0)
-  status      AssessmentStatus @default(failed)
-  unique_code String           @unique @default(uuid()) // Tambahkan field ini
-  created_at  DateTime         @default(now())
-  updated_at  DateTime         @updatedAt
+  score_id      String           @id @default(auto()) @map("_id") @db.ObjectId
+  badge         String?
+  score         Int?             @default(0)
+  status        AssessmentStatus @default(failed)
+  unique_code   String           @unique @default(uuid()) // Tambahkan field ini
+  created_at    DateTime         @default(now())
+  updated_at    DateTime         @updatedAt
 
   // Relations
   user                          User                @relation(fields: [user_id], references: [user_id])
-  user_id                       Int
+  user_id                       String              @db.ObjectId
   skillAssessment               SkillAssessment     @relation(fields: [assessment_id], references: [assessment_id])
-  assessment_id                 Int
+  assessment_id                 String              @db.ObjectId
   AssessmentQuestion            AssessmentQuestion? @relation(fields: [assessmentQuestionQuestion_id], references: [question_id])
-  assessmentQuestionQuestion_id Int?
+  assessmentQuestionQuestion_id String?             @db.ObjectId
   AssessmentAnswer              AssessmentAnswer?   @relation(fields: [assessmentAnswerAnswer_id], references: [answer_id])
-  assessmentAnswerAnswer_id     Int?
+  assessmentAnswerAnswer_id     String?             @db.ObjectId
 
   @@index([user_id])
   @@index([assessment_id])
 }
 
 model FeatureUsage {
-  id           Int      @id @default(autoincrement())
-  user_id      Int
+  id           String   @id @default(auto()) @map("_id") @db.ObjectId
+  user_id      String   @db.ObjectId
   feature_name String
   used_at      DateTime @default(now())
   user         User     @relation(fields: [user_id], references: [user_id])
@@ -723,8 +721,8 @@ model FeatureUsage {
 }
 
 model CV {
-  cv_id      Int      @id @default(autoincrement())
-  user_id    Int
+  cv_id      String   @id @default(auto()) @map("_id") @db.ObjectId
+  user_id    String   @db.ObjectId
   template   String   @default("ATS")
   content    Json
   created_at DateTime @default(now())
@@ -735,17 +733,17 @@ model CV {
 }
 
 model PaymentTransaction {
-  transaction_id       Int               @id @default(autoincrement())
-  user_id              Int
-  amount               Decimal
+  transaction_id       String            @id @default(auto()) @map("_id") @db.ObjectId
+  user_id              String            @db.ObjectId
+  amount               Float
   transaction_date     DateTime          @default(now())
   status               TransactionStatus @default(pending)
   payment_method       PaymentMethod?    @default(bank_transfer)
   receipt              String?
   created_at           DateTime          @default(now())
   updated_at           DateTime          @updatedAt
-  subscription_id      Int?
-  subscription_type_id Int
+  subscription_id      String?           @db.ObjectId
+  subscription_type_id String            @db.ObjectId
   subscription         Subscription?     @relation(fields: [subscription_id], references: [subscription_id])
   subscriptionType     SubscriptionType  @relation(fields: [subscription_type_id], references: [subs_type_id])
   user                 User              @relation(fields: [user_id], references: [user_id])

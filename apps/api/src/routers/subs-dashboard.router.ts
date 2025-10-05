@@ -2,7 +2,7 @@ import { DashboardController } from '@/controllers/subscript.controller';
 import { checkDeveloperRole } from '@/middlewares/checkRole';
 import { verifyToken } from '@/middlewares/token';
 import { Router } from 'express';
-
+import { checkActiveSubscription } from '@/middlewares/premiumFeature'; 
 
 export class SubscriptionDashboardRouter {
   private router: Router;
@@ -16,8 +16,9 @@ export class SubscriptionDashboardRouter {
 
   private initializeRoutes(): void {
     this.router.get('/dashboard', verifyToken, checkDeveloperRole, this.dashboardController.getDashboardData);
-    this.router.get('/check-active', verifyToken,  this.dashboardController.checkActiveSubscription);
-    
+
+    // ✅ APPLY the middleware to the route, just like in CvRouter
+    this.router.get('/check-active', verifyToken, checkActiveSubscription, this.dashboardController.checkActiveSubscription);
   }
 
   getRouter(): Router {

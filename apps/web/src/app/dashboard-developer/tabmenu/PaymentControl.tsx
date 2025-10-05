@@ -160,7 +160,7 @@ const BillsManage: React.FC = () => {
                 <td className="px-4 py-2 text-center">
                   {tx.receipt ? (
                     <a
-                      href={`${base_url}/public/payment-proof/${tx.receipt}`}
+                      href={`${tx.receipt}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="text-blue-500 flex justify-center"

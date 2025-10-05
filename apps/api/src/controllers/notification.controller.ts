@@ -23,7 +23,7 @@ export class NotificationController {
     try {
       const { notificationId } = req.params;
       const notification = await prisma.notification.update({
-        where: { notification_id: Number(notificationId) },
+        where: { notification_id: notificationId },
         data: { is_read: true },
       });
       res.status(200).json({ msg: 'Notification marked as read', notification });

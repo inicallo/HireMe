@@ -4,7 +4,6 @@ import { Request, Response } from 'express';
 const prisma = new PrismaClient();
 
 export class ReviewController {
-  // Constructor untuk mengikat metode ke 'this'
   async createReview(req: Request, res: Response) {
     const {
       comment,
@@ -24,7 +23,6 @@ export class ReviewController {
         return res.status(403).json({ message: 'User not authenticated' });
       }
 
-      // Ambil company_id dari database jika tidak ada di body
       const userCompany = await prisma.company.findFirst({
         where: {
           company_id: req.body.company_id,
@@ -43,7 +41,6 @@ export class ReviewController {
 
       const verifiedCompanyId = userCompany.company_id;
 
-      // Periksa apakah ulasan sudah ada untuk user dan perusahaan ini
       const existingReview = await prisma.review.findFirst({
         where: {
           user_id,
@@ -57,7 +54,6 @@ export class ReviewController {
         });
       }
 
-      // Hitung rata-rata rating dari empat aspek lainnya
       const ratings = [
         workCultureRating,
         workLifeBalanceRating,
@@ -73,7 +69,6 @@ export class ReviewController {
           )
         : null;
 
-      // Membuat ulasan baru
       const newReview = await prisma.review.create({
         data: {
           rating: averageRating,
@@ -99,19 +94,18 @@ export class ReviewController {
     }
   }
 
-  // Mendapatkan semua ulasan untuk sebuah perusahaan
   async getReviewsByCompany(req: Request, res: Response) {
     const { company_id } = req.params;
 
     try {
       const reviews = await prisma.review.findMany({
-        where: { company_id: Number(company_id) },
+        where: { company_id: company_id },
         select: {
           review_id: true,
           rating: true,
           comment: true,
           salary_estimate: true,
-          position: true, // Mengambil `position` langsung dari model `Review`
+          position: true,
           workCultureRating: true,
           workLifeBalanceRating: true,
           facilitiesRating: true,
@@ -119,8 +113,7 @@ export class ReviewController {
           created_at: true,
           user: {
             select: {
-              user_id: true, // Ambil atribut dari `User` jika diperlukan
-              // tambahkan atribut lain dari `User` yang diperlukan
+              user_id: true, 
             },
           },
         },
@@ -133,20 +126,17 @@ export class ReviewController {
     }
   }
 
-  // Mendapatkan rata-rata rating untuk sebuah perusahaan
   async getAverageRatingByCompany(req: Request, res: Response) {
     const { company_id } = req.params;
 
     try {
-      // Dapatkan semua rating untuk `company_id` tertentu
       const reviews = await prisma.review.findMany({
-        where: { company_id: Number(company_id) },
+        where: { company_id: company_id },
         select: {
           rating: true,
         },
       });
 
-      // Jika tidak ada ulasan, return 0 atau informasi bahwa belum ada rating
       if (reviews.length === 0) {
         return res.status(200).json({
           averageRating: 0,
@@ -154,9 +144,8 @@ export class ReviewController {
         });
       }
 
-      // Hitung rata-rata rating
       const totalRating = reviews.reduce(
-        (sum, review) => sum + (review.rating ? review.rating.toNumber() : 0),
+        (sum, review) => sum + (review.rating ? review.rating : 0),
         0,
       );
 

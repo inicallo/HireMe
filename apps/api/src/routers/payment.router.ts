@@ -3,6 +3,9 @@ import { PaymentController } from '@/controllers/payment.controller';
 import { verifyToken } from '@/middlewares/token';
 import { checkDeveloperRole } from '@/middlewares/checkRole';
 import { uploader } from '@/middlewares/uploader';
+import { cloudinaryUploader } from '@/middlewares/cloudinary.middleware'; 
+import { fetchUserName } from '@/middlewares/fetchUserName';
+import { generatePublicId } from '@/routers/application.router'; 
 
 export class PaymentRouter {
   private router: Router;
@@ -19,7 +22,9 @@ export class PaymentRouter {
     this.router.post(
       '/upload',
       verifyToken,
-      uploader('payment', 'payment').single('file'), // Menggunakan uploader
+      fetchUserName,
+      uploader('payment', 'payment').single('file'),
+      cloudinaryUploader('payment_proofs', generatePublicId('payment_proofs')),
       this.paymentController.uploadPaymentProof,
     );
 

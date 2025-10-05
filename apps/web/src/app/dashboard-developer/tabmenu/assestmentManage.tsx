@@ -53,7 +53,7 @@ const DeveloperAssessment: React.FC = () => {
   const handleDeleteAssessment = async (id: number) => {
     try {
       setLoading(true);
-      await fetchDeleteAssessment(id);
+      await fetchDeleteAssessment(id.toString());
       toast.success('Assessment deleted successfully!');
       await loadAssessments();
     } catch (error: any) {

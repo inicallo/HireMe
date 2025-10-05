@@ -10,9 +10,9 @@ const BadgeSystem: React.FC<{ userId: string | number }> = ({ userId }) => {
   useEffect(() => {
     const loadBadges = async () => {
       try {
-        const data = await fetchUserBadgesById(userId); 
+        const data = await fetchUserBadgesById(String(userId)); 
         if (data.length > 0) {
-          setBadges([data[0]]); // Ambil hanya badge pertama
+          setBadges([data[0]]);
         } else {
           setBadges([]); 
         }

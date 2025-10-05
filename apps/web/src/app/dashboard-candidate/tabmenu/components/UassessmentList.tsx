@@ -1,14 +1,9 @@
-// components/SkillAssessmentList.tsx
 import React from 'react';
-
-type Assessment = {
-  assessment_id: number;
-  assessment_data: string;
-};
+import { Assessment } from '@/types/assessment';
 
 type SkillAssessmentListProps = {
   assessments: Assessment[];
-  onStart: (id: number) => void;
+  onStart: (id: string) => void;
   loading: boolean;
 };
 
@@ -27,7 +22,7 @@ const SkillAssessmentList: React.FC<SkillAssessmentListProps> = ({ assessments, 
             >
               <span className="text-lg font-semibold text-blue-700">{assessment.assessment_data}</span>
               <button
-                onClick={() => onStart(assessment.assessment_id)}
+                onClick={() => onStart(String(assessment.assessment_id))}
                 className="px-4 py-2 text-sm text-white bg-blue-500 rounded hover:bg-blue-600"
               >
                 Start

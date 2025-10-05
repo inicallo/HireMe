@@ -8,35 +8,22 @@ import {
   JobType,
   Prisma,
 } from '@prisma/client';
+import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 
 export class JobController {
   async createJob(req: Request, res: Response) {
     try {
-
       const {
-        job_title,
-        description,
-        location,
-        country,
-        salary,
-        jobType,
-        jobCategory,
-        jobEducationLevel,
-        jobExperience,
-        responsibility,
-        jobExpired_at,
-        companyId,
-        is_active,
+        job_title, description, location, country, salary, jobType, jobCategory,
+        jobEducationLevel, jobExperience, responsibility, jobExpired_at, companyId, is_active,
       } = req.body;
 
       const userId = req.user?.user_id;
 
       if (!job_title || !description || !companyId || !userId) {
-        throw new Error(
-          'Job title, description, company ID, and user ID are required',
-        );
+        return res.status(400).json({ msg: 'Job title, description, company ID, and user ID are required' });
       }
-
+      
       const jobData: Prisma.JobCreateInput = {
         job_title,
         description,
@@ -46,252 +33,188 @@ export class JobController {
         jobCategory,
         jobExperience,
         jobEducationLevel,
-        jobExpired_at,
         responsibility,
+        jobExpired_at: jobExpired_at ? new Date(jobExpired_at) : null,
         salary: salary ? parseFloat(salary) : null,
-        is_active: is_active === 'true',
-        company: { connect: { company_id: parseInt(companyId, 10) } },
+        is_active: Boolean(is_active),
+        company: { connect: { company_id: companyId } },
         user: { connect: { user_id: userId } },
       };
 
-      const job = await prisma.job.create({
-        data: jobData,
-      });
-
+      const job = await prisma.job.create({ data: jobData });
       res.status(201).json({ job });
-    } catch (err) {
-      res.status(400).json({
-        msg: err instanceof Error ? err.message : 'An error occurred',
-        error: err, // Tambahkan log untuk error detail
-      });
-      
+    } catch (error) {
+      console.error('Error creating job:', error);
+      res.status(500).json({ msg: 'An error occurred while creating the job.' });
     }
   }
 
   async getJobs(req: Request, res: Response) {
     try {
       const {
-        search,
-        jobType,
-        salary,
-        jobCategory,
-        jobEducationLevel,
-        jobExperience,
-        country,
-        location,
-        dateRange,
+        search, jobType, salary, jobCategory, jobEducationLevel,
+        jobExperience, country, location, dateRange,
       } = req.query;
 
-      const filter: Prisma.JobWhereInput = { is_active: true };
+      const filters: Prisma.JobWhereInput[] = [{ is_active: true }];
 
-      // Search filter
-      if (typeof search === 'string') {
-        const lowerSearch = search.toLowerCase();
-        filter.OR = [
-          { job_title: { contains: lowerSearch } },
-          { location: { contains: lowerSearch } },
-          { company: { company_name: { contains: lowerSearch } } },
-        ];
+      if (typeof search === 'string' && search) {
+        filters.push({
+          OR: [
+            { job_title: { contains: search, mode: 'insensitive' } },
+            { location: { contains: search, mode: 'insensitive' } },
+            { company: { company_name: { contains: search, mode: 'insensitive' } } },
+          ],
+        });
       }
-      // Country filter
-      if (country) filter.country = country as CountryCode;
-      if (location) filter.location = { contains: location as string };
+      if (country) filters.push({ country: country as CountryCode });
+      if (location) filters.push({ location: { contains: location as string, mode: 'insensitive' } });
 
-      // Job Type filter
-      if (jobType) {
-        const jobTypeArray = Array.isArray(jobType) ? jobType : [jobType];
-        filter.jobType = { in: jobTypeArray as JobType[] };
-      }
+      const createInFilter = (field: keyof Prisma.JobWhereInput, values: any) => {
+        const arr = Array.isArray(values) ? values : [values];
+        if (arr.length > 0) {
+          filters.push({ [field]: { in: arr } });
+        }
+      };
+      
+      if (jobType) createInFilter('jobType', jobType as JobType[]);
+      if (jobCategory) createInFilter('jobCategory', jobCategory as JobCategory[]);
+      if (jobEducationLevel) createInFilter('jobEducationLevel', jobEducationLevel as JobEducationLevel[]);
+      if (jobExperience) createInFilter('jobExperience', jobExperience as JobExperience[]);
 
-      // Job Category filter
-      if (jobCategory) {
-        const jobCategoryArray = Array.isArray(jobCategory)
-          ? jobCategory
-          : [jobCategory];
-        filter.jobCategory = { in: jobCategoryArray as JobCategory[] };
-      }
-
-      // Job Education Level filter
-      if (jobEducationLevel) {
-        const jobEducationLevelArray = Array.isArray(jobEducationLevel)
-          ? jobEducationLevel
-          : [jobEducationLevel];
-        filter.jobEducationLevel = {
-          in: jobEducationLevelArray as JobEducationLevel[],
-        };
-      }
-
-      // Job Experience filter
-      if (jobExperience) {
-        const jobExperienceArray = Array.isArray(jobExperience)
-          ? jobExperience
-          : [jobExperience];
-        filter.jobExperience = { in: jobExperienceArray as JobExperience[] };
-      }
-
-      // Salary filter
       if (salary) {
-        const salaryArray = Array.isArray(salary) ? salary : [salary];
-        filter.salary = {
-          OR: salaryArray.map((range) => {
-            if (typeof range === 'string') {
-              if (range === '5000') return { gte: 5000 };
-              const [minSalary, maxSalary] = range.split('-').map(Number);
-              return {
-                gte: minSalary,
-                ...(maxSalary ? { lte: maxSalary } : {}),
-              };
+        const salaryRanges = Array.isArray(salary) ? salary : [salary];
+        const salaryFilters = salaryRanges.map(range => {
+          if (typeof range === 'string') {
+            if (range.includes('-')) {
+              const [min, max] = range.split('-').map(Number);
+              return { salary: { gte: min, lte: max } };
             }
-            return {};
-          }),
-        } as Prisma.IntFilter;
+            return { salary: { gte: Number(range) } };
+          }
+          return {};
+        });
+        if (salaryFilters.length > 0) {
+            filters.push({ OR: salaryFilters });
+        }
       }
 
-      // Order jobs by date
-      const orderBy = {
+      const orderBy: Prisma.JobOrderByWithRelationInput = {
         created_at: dateRange === 'latest' ? 'desc' : 'asc',
-      } as Prisma.JobOrderByWithRelationInput;
+      };
 
-      // Fetch jobs with filters and ordering
       const jobs = await prisma.job.findMany({
-        where: filter,
+        where: { AND: filters },
         include: { company: true },
         orderBy,
       });
 
       res.status(200).json({ status: 'ok', jobs });
     } catch (error) {
-      res
-        .status(500)
-        .json({ status: 'error', message: 'Failed to fetch jobs' });
+      console.error('Error fetching jobs:', error);
+      res.status(500).json({ status: 'error', message: 'Failed to fetch jobs' });
     }
   }
 
   async getJobById(req: Request, res: Response) {
     try {
       const { id } = req.params;
-
-      if (!id || isNaN(Number(id))) {
-        return res.status(400).json({ msg: 'Invalid job ID' });
-      }
-
       const job = await prisma.job.findUnique({
-        where: { job_id: Number(id) },
+        where: { job_id: id },
         include: {
           company: {
             include: {
-              jobs: { where: { job_id: { not: Number(id) } } },
+              jobs: { where: { job_id: { not: id } } },
             },
           },
         },
       });
 
-      if (!job) {
-        return res.status(404).json({ msg: 'Job not found' });
+      if (!job) return res.status(404).json({ msg: 'Job not found' });
+      res.status(200).json({ job });
+    } catch (error) {
+      console.error(`Error fetching job ${req.params.id}:`, error);
+      res.status(500).json({ msg: 'An error occurred while fetching the job.' });
+    }
+  }
+  
+  async updateJob(req: Request, res: Response) {
+    try {
+      const jobId = req.params.id;
+      const data = req.body;
+
+      const updateData: Prisma.JobUpdateInput = {};
+      
+      if (data.job_title) updateData.job_title = data.job_title;
+      if (data.description) updateData.description = data.description;
+      if (data.responsibility) updateData.responsibility = data.responsibility;
+      if (data.location) updateData.location = data.location;
+      if (data.country) updateData.country = data.country;
+      if (data.jobCategory) updateData.jobCategory = data.jobCategory;
+      if (data.jobEducationLevel) updateData.jobEducationLevel = data.jobEducationLevel;
+      if (data.salary !== undefined) updateData.salary = parseFloat(data.salary);
+      if (data.jobExpired_at) updateData.jobExpired_at = new Date(data.jobExpired_at);
+      if (data.is_active !== undefined) updateData.is_active = data.is_active;
+
+      // CRITICAL: Prevent the enum error for jobExperience
+      if (data.jobExperience) { // Only update if it's a non-empty string
+        updateData.jobExperience = data.jobExperience;
       }
 
-      res.status(200).json({ job });
-    } catch (err) {
-      res.status(500).json({
-        msg: 'An error occurred while fetching the job information',
+      const updatedJob = await prisma.job.update({
+        where: { job_id: jobId },
+        data: updateData,
       });
+
+      res.status(200).json({ status: 'ok', msg: 'Job updated successfully!', job: updatedJob });
+    } catch (error) {
+      if (error instanceof PrismaClientKnownRequestError && error.code === 'P2025') {
+        return res.status(404).json({ status: 'error', msg: 'Job not found' });
+      }
+      console.error(`Error updating job ${req.params.id}:`, error);
+      res.status(400).json({ status: 'error', msg: 'An error occurred while updating the job.' });
+    }
+  }
+
+  async deleteJob(req: Request, res: Response) {
+    try {
+      const jobId = req.params.id;
+      await prisma.job.delete({ where: { job_id: jobId } });
+      res.status(200).json({ status: 'ok', msg: 'Job deleted successfully' });
+    } catch (error) {
+      if (error instanceof PrismaClientKnownRequestError && error.code === 'P2025') {
+        return res.status(404).json({ status: 'error', msg: 'Job not found' });
+      }
+      console.error(`Error deleting job ${req.params.id}:`, error);
+      res.status(500).json({ status: 'error', msg: 'Failed to delete job' });
     }
   }
 
   async getJobsByCompanyId(req: Request, res: Response) {
     try {
-      const { companyId } = req.params;
-
-      if (!companyId || isNaN(Number(companyId))) {
-        return res.status(400).json({ msg: 'Invalid company ID' });
-      }
+      const { companyId } = req.params; 
 
       const jobs = await prisma.job.findMany({
-        where: { company_id: Number(companyId), is_active: true },
+        where: { company_id: companyId, is_active: true },
         include: { company: true },
       });
 
       res.status(200).json({ status: 'ok', jobs });
     } catch (error) {
-      res.status(500).json({
-        status: 'error',
-        message: 'Failed to fetch jobs by company ID',
-      });
-    }
-  }
-
-  async updateJob(req: Request, res: Response) {
-    try {
-      const jobId = parseInt(req.params.id, 10); 
-      const {
-        job_title,
-        description,
-        responsibility,
-        location,
-        country,
-        salary,
-        jobCategory,
-        jobEducationLevel,
-        jobExperience,
-        jobExpired_at,
-        is_active,
-      } = req.body;
-      
-
-      if (isNaN(jobId)) {
-        return res
-          .status(400)
-          .json({ status: 'error', msg: 'Invalid job ID provided' });
-      }
-
-      const job = await prisma.job.findUnique({ where: { job_id: jobId } });
-      if (!job) {
-        return res.status(404).json({ status: 'error', msg: 'Job not found' });
-      }
-
-      const updatedJob = await prisma.job.update({
-        where: { job_id: jobId },
-        data: {
-          job_title,
-          description,
-          responsibility,
-          location,
-          country,
-          salary: salary ? parseFloat(salary) : job.salary,
-          jobCategory,
-          jobEducationLevel,
-          jobExperience,
-          jobExpired_at,
-          is_active: is_active !== undefined ? is_active : job.is_active,
-        },
-      });
-
-      res.status(200).json({
-        status: 'ok',
-        msg: 'Job information updated successfully!',
-        job: updatedJob,
-      });
-    } catch (error) {
-      res.status(400).json({
-        status: 'error',
-        msg: 'An error occurred while updating job information',
-      });
+      console.error(`Error fetching jobs for company ${req.params.companyId}:`, error);
+      res.status(500).json({ status: 'error', message: 'Failed to fetch jobs by company ID' });
     }
   }
 
   async getAppliedJobCount(req: Request, res: Response) {
     try {
       const userId = req.user?.user_id;
-      if (!userId) {
-        return res.status(400).json({ msg: 'User ID is required' });
-      }
+      if (!userId) return res.status(401).json({ msg: 'Unauthorized' });
 
-      const count = await prisma.application.count({
-        where: { user_id: userId },
-      });
-
+      const count = await prisma.application.count({ where: { user_id: userId } });
       res.status(200).json({ count });
     } catch (error) {
+      console.error(`Error fetching applied job count for user ${req.user?.user_id}:`, error);
       res.status(500).json({ msg: 'Failed to fetch applied job count' });
     }
   }
@@ -299,16 +222,12 @@ export class JobController {
   async getFavoriteJobCount(req: Request, res: Response) {
     try {
       const userId = req.user?.user_id;
-      if (!userId) {
-        return res.status(400).json({ msg: 'User ID is required' });
-      }
+      if (!userId) return res.status(401).json({ msg: 'Unauthorized' });
 
-      const count = await prisma.favorite.count({
-        where: { user_id: userId },
-      });
-
+      const count = await prisma.favorite.count({ where: { user_id: userId } });
       res.status(200).json({ count });
     } catch (error) {
+      console.error(`Error fetching favorite job count for user ${req.user?.user_id}:`, error);
       res.status(500).json({ msg: 'Failed to fetch favorite job count' });
     }
   }
@@ -318,17 +237,15 @@ export class JobController {
       const userId = req.user?.user_id;
       const { jobId } = req.body;
 
-      if (!userId || !jobId) {
-        return res.status(400).json({ msg: 'User ID and Job ID are required' });
-      }
+      if (!userId || !jobId) return res.status(400).json({ msg: 'User ID and Job ID are required' });
 
-      const existingFavorite = await prisma.favorite.findFirst({
-        where: { user_id: userId, job_id: jobId },
+      const existingFavorite = await prisma.favorite.findUnique({
+        where: { user_id_job_id: { user_id: userId, job_id: jobId } },
       });
-
+      
       if (existingFavorite) {
         await prisma.favorite.delete({
-          where: { id: existingFavorite.id },
+          where: { user_id_job_id: { user_id: userId, job_id: jobId } },
         });
         res.status(200).json({ msg: 'Job removed from favorites' });
       } else {
@@ -341,6 +258,7 @@ export class JobController {
         res.status(200).json({ msg: 'Job saved to favorites' });
       }
     } catch (error) {
+      console.error('Error toggling save job:', error);
       res.status(500).json({ msg: 'Failed to save job' });
     }
   }
@@ -348,67 +266,35 @@ export class JobController {
   async getFavoriteJobs(req: Request, res: Response) {
     try {
       const userId = req.user?.user_id;
-      if (!userId) {
-        return res.status(400).json({ msg: 'User ID is required' });
-      }
+      if (!userId) return res.status(401).json({ msg: 'Unauthorized' });
 
       const favorites = await prisma.favorite.findMany({
         where: { user_id: userId },
         include: {
-          job: {
-            include: { company: true },
-          },
+          job: { include: { company: true } },
         },
       });
-
-      res.status(200).json({
-        status: 'ok',
-        favorites,
-      });
+      res.status(200).json({ status: 'ok', favorites });
     } catch (error) {
+      console.error(`Error fetching favorite jobs for user ${req.user?.user_id}:`, error);
       res.status(500).json({ msg: 'Failed to fetch favorite jobs' });
     }
   }
 
   async getRecentlyPostedJobs(req: Request, res: Response) {
     try {
-      const userId = parseInt(req.params.userId, 10);
-      if (isNaN(userId)) {
-        return res.status(400).json({ msg: 'Invalid User ID' });
-      }
+      const userId = req.params.userId;
+      if (!userId) return res.status(400).json({ msg: 'Invalid User ID' });
 
       const jobs = await prisma.job.findMany({
         where: { user_id: userId },
         orderBy: { created_at: 'desc' },
-        include: {
-          company: true,
-        },
+        include: { company: true },
       });
 
-      if (!jobs || jobs.length === 0) {
-        return res.status(404).json({ msg: 'No recently posted jobs found' });
-      }
-
-      res.status(200).json({
-        jobs: jobs.map((job) => ({
-          job_id: job.job_id,
-          job_title: job.job_title,
-          company_name: job.company?.company_name,
-          logo: job.company?.logo,
-          location: job.location,
-          job_country: job.country,
-          description: job.description,
-          job_responsible: job.responsibility,
-          job_type: job.jobCategory,
-          salary: job.salary,
-          education_level: job.jobEducationLevel,
-          experience_level: job.jobExperience,
-          date_posted: job.created_at,
-          jobExpired_at: job.jobExpired_at,
-          is_active: job.is_active,
-        })),
-      });
+      res.status(200).json({ jobs });
     } catch (error) {
+      console.error(`Error fetching recent jobs for user ${req.params.userId}:`, error);
       res.status(500).json({ msg: 'Failed to fetch recently posted jobs' });
     }
   }
@@ -416,52 +302,33 @@ export class JobController {
   async getTotalJobsCount(req: Request, res: Response) {
     try {
       const userId = req.user?.user_id;
-  
-      if (!userId) {
-        return res.status(400).json({ msg: 'User ID is required' });
-      }
-  
+      if (!userId) return res.status(401).json({ msg: 'Unauthorized' });
 
-      const totalJobsCount = await prisma.job.count({
-        where: {
-          user_id: userId,
-        },
-      });
-  
-      res.status(200).json({
-        totalJobsCount,
-      });
+      const totalJobsCount = await prisma.job.count({ where: { user_id: userId } });
+      res.status(200).json({ totalJobsCount });
     } catch (error) {
+      console.error(`Error fetching total jobs count for user ${req.user?.user_id}:`, error);
       res.status(500).json({ msg: 'Failed to fetch total jobs count' });
     }
   }
   
-  async deleteJob(req: Request, res: Response) {
+  async getTotalApplicantsCount(req: Request, res: Response) {
     try {
-      const jobId = parseInt(req.params.id, 10);
+      const userId = req.user?.user_id;
+      if (!userId) return res.status(401).json({ msg: 'Unauthorized' });
 
-  
-      if (isNaN(jobId)) {
-        return res.status(400).json({ msg: 'Invalid job ID provided' });
-      }
+      const count = await prisma.application.count({
+        where: {
+          job: {
+            user_id: userId,
+          },
+        },
+      });
 
-      const job = await prisma.job.findUnique({
-        where: { job_id: jobId },
-      });
-  
-      if (!job) {
-        return res.status(404).json({ msg: 'Job not found' });
-      }
-  
-      await prisma.job.delete({
-        where: { job_id: jobId },
-      });
-  
-      res.status(200).json({ status: 'ok', msg: 'Job deleted successfully' });
+      res.status(200).json({ count });
     } catch (error) {
-      res.status(500).json({ status: 'error', msg: 'Failed to delete job' });
+      console.error(`Error fetching total applicants for user ${req.user?.user_id}:`, error);
+      res.status(500).json({ msg: 'Failed to fetch total applicants count' });
     }
   }
-  
-  
 }

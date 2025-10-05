@@ -18,7 +18,7 @@ const JobPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isSaved, setIsSaved] = useState(false);
-  const [hasApplied, setHasApplied] = useState(false); 
+  const [hasApplied, setHasApplied] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -61,6 +61,16 @@ const JobPage = () => {
     setIsSaved(!isSaved);
   };
 
+  // --- Helper function to render text with proper formatting ---
+  const renderFormattedText = (text: string | null | undefined) => {
+    if (!text) return null;
+    return text.split('\n').map((line, index) => (
+      <p key={index} className="mb-3">
+        {line || <>&nbsp;</>}
+      </p>
+    ));
+  };
+
   return (
     <ProtectedRoute requiredRole="candidate">
       <div className="flex flex-col items-center w-full min-h-screen bg-gray-100 p-4 md:p-6 lg:p-8 pt-24 md:mt-16 lg:mt-0">
@@ -68,7 +78,7 @@ const JobPage = () => {
           {/* Main Layout for Job and Sidebar */}
           <div className="flex flex-col lg:flex-row gap-8">
             {/* Main Job Details Section */}
-            <div className="flex-1 bg-white shadow-lg rounded-lg p-4 md:p-6 lg:p-8 space-y-6">
+            <div className="flex-1 bg-white shadow-lg rounded-lg p-4 md:p-6 lg:p-8 space-y-8">
               <HeaderSection
                 job={job}
                 isSaved={isSaved}
@@ -76,26 +86,27 @@ const JobPage = () => {
                 hasApplied={hasApplied}
               />
 
-              {/* Job Description Section */}
+              {/* --- STYLING UPDATE: Job Description Section --- */}
               <section>
-                <h2 className="text-lg md:text-xl font-semibold mb-2">
+                <h2 className="text-xl md:text-2xl font-bold text-gray-800 mb-4 border-b pb-2">
                   Job Description
                 </h2>
-                <p className="text-gray-700 text-sm md:text-base">
-                  {job.description}
-                </p>
+                <div className="prose prose-sm md:prose-base max-w-none text-gray-700">
+                  {renderFormattedText(job.description)}
+                </div>
               </section>
 
-              {/* Responsibilities Section */}
+              {/* --- STYLING UPDATE: Responsibilities Section --- */}
               <section>
-                <h2 className="text-lg md:text-xl font-semibold mb-2">
+                <h2 className="text-xl md:text-2xl font-bold text-gray-800 mb-4 border-b pb-2">
                   Responsibilities
                 </h2>
-                <p className="text-gray-700 text-sm md:text-base">
-                  {job.responsibility}
-                </p>
+                <div className="prose prose-sm md:prose-base max-w-none text-gray-700">
+                  {renderFormattedText(job.responsibility)}
+                </div>
               </section>
-              <ShareButton id={job.job_id}/>
+
+              <ShareButton id={job.job_id} />
             </div>
 
             {/* Sidebar Section */}

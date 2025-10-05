@@ -4,7 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { toast, ToastContainer } from 'react-toastify';
+import { toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import { requestPasswordReset } from '@/services/passwordService';
 import Background from '../../assets/BG-CreateAccount.png';
@@ -38,7 +38,6 @@ const ForgetPassword = () => {
 
   return (
     <div className="min-h-screen flex bg-white">
-      <ToastContainer position="bottom-right" autoClose={3000} hideProgressBar />
       <div className="w-full lg:w-1/2 bg-white py-16 lg:py-28 px-6 sm:px-12 flex flex-col justify-center relative">
         <div className="max-w-md mx-auto m-6 lg:mt-[-250px] md:mt-[-120px]">
           <h2 className="text-3xl pb-3 font-semibold">Forget Password</h2>

@@ -1,11 +1,12 @@
 import { NextFunction, Request, Response } from 'express';
 import { verify } from 'jsonwebtoken';
+import { SECRET_JWT } from '../config';
 
-type IUser = {
-  user_id: number;
-  role: string;
-  company_id?: number;
-};
+// type IUser = {
+//   user_id: string;
+//   role: string;
+//   company_id?: string;
+// };
 
 export const verifyToken = async (
   req: Request,
@@ -13,13 +14,14 @@ export const verifyToken = async (
   next: NextFunction,
 ) => {
   try {
-    const token = req.cookies?.token || req.header('Authorization')?.replace('Bearer ', '');
+    const token =
+      req.cookies?.token || req.header('Authorization')?.replace('Bearer ', '');
 
     if (!token) throw new Error('Token is missing');
 
-    const verifiedToken = verify(token, process.env.SECRET_JWT!);
+    const verifiedToken = verify(token, SECRET_JWT);
 
-    req.user = verifiedToken as IUser;
+    req.user = verifiedToken as Express.Request['user'];
 
     next();
   } catch (err) {

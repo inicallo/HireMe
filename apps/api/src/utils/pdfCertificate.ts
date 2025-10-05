@@ -4,7 +4,7 @@ import { Response } from 'express';
 export const certificatePDF = async (
   res: Response,
   scoreData: {
-    score_id: number;
+    score_id: string; 
     assessment_data: string;
     score: number;
     user_name: string;
@@ -18,7 +18,7 @@ export const certificatePDF = async (
 
     doc.on('data', (chunk) => chunks.push(chunk));
     doc.on('end', () => {
-      const result = Buffer.concat(chunks);
+      const result = Buffer.concat(chunks as Uint8Array[]);
       res.setHeader('Content-Type', 'application/pdf');
       res.setHeader(
         'Content-Disposition',

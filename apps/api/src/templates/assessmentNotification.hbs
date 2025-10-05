@@ -1,0 +1,65 @@
+<html lang='en'>
+  <head>
+    <meta charset='UTF-8' />
+    <meta http-equiv='X-UA-Compatible' content='IE=edge' />
+    <meta name='viewport' content='width=device-width, initial-scale=1.0' />
+    <title>Pre-Selection Assessment Required</title>
+    <style>
+      /* --- Styles copied from applicationConfirmation.hbs --- */
+      body { font-family: Arial, sans-serif;
+      background-color: #f7f8fa; margin:
+      0; padding: 0; display: flex; justify-content: center;
+      align-items:
+      center; height: 100vh; } .email-container { background-color: #ffffff;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); max-width:
+      500px; padding: 20px; text-align: center;
+      } h2 { color: #2d3748;
+      font-size: 24px; margin-bottom: 16px; } p { color: #4a5568;
+      font-size:
+      16px; margin-bottom: 24px; } .btn { background-color: #38a169; /* Green button for action/start */
+      color:
+      #ffffff; padding: 14px 28px; border-radius: 30px; font-size: 18px;
+      font-weight: 600; display: inline-block; text-align: center;
+      text-decoration: none; transition: background-color 0.3s ease, box-shadow
+      0.3s ease;
+      box-shadow: 0 4px 8px rgba(56, 161, 105, 0.4); border: none;
+      cursor: pointer; } .btn:hover { background-color: #2f855a;
+      } .footer {
+      margin-top: 40px; font-size: 12px; color: #a0aec0;
+      }
+      /* ------------------------------------------------ */
+    </style>
+  </head>
+  <body>
+    <div class='email-container'>
+      <h2>Action Required: Start Your Assessment</h2>
+      <p>Hello {{name}},</p>
+      <p>
+        Thank you for your interest in the **{{jobTitle}}** position!
+      </p>
+      <p>
+        To proceed with your application, please complete a short pre-selection assessment. This helps us quickly evaluate essential skills for the role.
+      </p>
+      
+      <p style="font-weight: bold; color: #e53e3e;">
+        Please note that this assessment must be completed within the time limit.
+      </p>
+
+      <a href='{{link}}' target='_blank' class='btn'>Start Assessment Now</a>
+      
+      <p style="margin-top: 30px; font-size: 14px;">
+        Click the button above to begin. Good luck!
+      </p>
+
+      <div class='footer'>
+        <p>This assessment is crucial for your application status.</p>
+        <p>If you have any issues accessing the test, please visit our
+          <a
+            href='{{base_fe_url}}/Contact-center'
+            style='color: #38a169; text-decoration: none;'
+          >Contact Center</a>.</p>
+      </div>
+    </div>
+  </body>
+</html>

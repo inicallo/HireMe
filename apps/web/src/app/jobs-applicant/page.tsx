@@ -2,7 +2,14 @@
 
 import React, { useState } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { Typography, Button, Menu, MenuItem, TextField, Paper } from '@mui/material';
+import {
+  Typography,
+  Button,
+  Menu,
+  MenuItem,
+  TextField,
+  Paper,
+} from '@mui/material';
 import { FilterList } from '@mui/icons-material';
 import MyCompanyJobSideBar from '@/components/MyCompanyJobSideBar';
 import AllApplications from './components/AllApplications';
@@ -10,9 +17,9 @@ import ProtectedRoute from '@/components/ProtectedRoute';
 
 const JobApplications: React.FC = () => {
   const searchParams = useSearchParams();
-  const jobId = searchParams.get('jobId'); 
-  const jobTitle = searchParams.get('jobTitle'); 
-  
+  const jobId = searchParams.get('jobId'); // Now correctly kept as a string
+  const jobTitle = searchParams.get('jobTitle');
+
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [sort, setSort] = useState('Newest');
   const [searchName, setSearchName] = useState('');
@@ -32,7 +39,11 @@ const JobApplications: React.FC = () => {
     handleMenuClose();
   };
 
-  if (!jobId) return <div>Loading...</div>;
+  if (!jobId) {
+    return <div>Loading...</div>;
+  }
+
+  const finalJobId = jobId;
 
   return (
     <ProtectedRoute requiredRole="admin">
@@ -51,11 +62,22 @@ const JobApplications: React.FC = () => {
                 variant="contained"
                 className="bg-blue-600 hover:bg-blue-700 text-white rounded-lg shadow-md text-sm"
               >
-                Sort
+                Sort: {sort}
               </Button>
-              <Menu anchorEl={anchorEl} open={Boolean(anchorEl)} onClose={handleMenuClose}>
-                <MenuItem onClick={() => handleSortChange('Newest')}>Newest</MenuItem>
-                <MenuItem onClick={() => handleSortChange('Oldest')}>Oldest</MenuItem>
+              <Menu
+                anchorEl={anchorEl}
+                open={Boolean(anchorEl)}
+                onClose={handleMenuClose}
+              >
+                <MenuItem onClick={() => handleSortChange('Newest')}>
+                  Newest
+                </MenuItem>
+                <MenuItem onClick={() => handleSortChange('Oldest')}>
+                  Oldest
+                </MenuItem>
+                <MenuItem onClick={() => handleSortChange('CorrectAnswers')}>
+                  Correct Answers
+                </MenuItem>
               </Menu>
             </div>
 
@@ -92,7 +114,13 @@ const JobApplications: React.FC = () => {
 
           {/* Application Cards */}
           <div>
-            <AllApplications jobId={Number(jobId)} />
+            <AllApplications
+              jobId={finalJobId}
+              sort={sort}
+              searchName={searchName}
+              searchExperience={searchExperience}
+              searchEducation={searchEducation}
+            />
           </div>
         </main>
       </div>

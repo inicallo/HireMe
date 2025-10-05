@@ -1,4 +1,4 @@
-"use client";
+'use client';
 import { useState } from 'react';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
@@ -10,6 +10,7 @@ import { checkPreSelectionTest } from '@/lib/applyJob';
 const ApplyModal = ({ jobId }: any) => {
   const [coverLetter, setCoverLetter] = useState('');
   const [resume, setResume] = useState<File | null>(null);
+  const [hasAssessment, setHasAssessment] = useState(false); // 💡 NEW STATE for assessment status
   const [showConfirmation, setShowConfirmation] = useState<{
     type: 'apply' | 'cancel' | null;
   }>({ type: null });
@@ -27,12 +28,9 @@ const ApplyModal = ({ jobId }: any) => {
 
   const handleApplyClick = async () => {
     const hasTest = await checkPreSelectionTest(jobId);
+    setHasAssessment(hasTest);
 
-    if (hasTest) {
-      setShowConfirmation({ type: 'apply' });
-    } else {
-      setShowConfirmation({ type: 'apply' });
-    }
+    setShowConfirmation({ type: 'apply' });
   };
 
   const handleConfirm = async () => {
@@ -41,10 +39,20 @@ const ApplyModal = ({ jobId }: any) => {
         toast.warning('Please upload a resume before applying.');
         return;
       }
+
       const response = await applyForJob(jobId, coverLetter, resume);
+
       if (response.ok) {
         toast.success('Application submitted successfully!');
-        router.push(`/pre-selectiontest/${jobId}`);
+
+        if (hasAssessment) {
+          toast.info(
+            'Check your email! You will receive a pre-selection assessment shortly.',
+            { autoClose: 8000 },
+          );
+        }
+
+        router.push(`/job-page`);
         setShowConfirmation({ type: null });
         return;
       } else {
@@ -121,7 +129,7 @@ const ApplyModal = ({ jobId }: any) => {
             onClick={handleApplyClick}
             className="btn bg-blue-600 text-white px-5 py-2 rounded-lg hover:bg-blue-700 transition-all w-full sm:w-auto text-sm font-semibold"
           >
-            Yes, Apply Now
+            Apply Now
           </button>
         </div>
 

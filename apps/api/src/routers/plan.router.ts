@@ -17,10 +17,9 @@ export class SubsTypeRouter {
     this.router.get('/', this.subsController.getSubsType);
     this.router.get('/:id', this.subsController.getSubsTypeById);
     
-    // Protected for Dev
-    this.router.post('/create', verifyToken, checkDeveloperRole, this.subsController.createSubsType);
-    this.router.put('/update/:id', verifyToken, checkDeveloperRole, this.subsController.updateSubsType);
-    this.router.delete('/delete/:id', verifyToken, checkDeveloperRole,  this.subsController.deleteSubsType);
+    this.router.post('/', verifyToken, checkDeveloperRole, this.subsController.createSubsType);
+    this.router.patch('/:id', verifyToken, checkDeveloperRole, this.subsController.updateSubsType);
+    this.router.delete('/:id', verifyToken, checkDeveloperRole,  this.subsController.deleteSubsType);
   }
 
   getRouter(): Router {

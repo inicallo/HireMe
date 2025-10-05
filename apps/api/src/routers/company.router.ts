@@ -3,7 +3,8 @@ import { verifyToken } from '@/middlewares/token';
 import { logoBannerUploader } from '@/middlewares/logoBannerUploader';
 import { Router } from 'express';
 import { checkAdminDev } from '@/middlewares/checkRole';
-
+import { handleCompanyMedia } from '@/middlewares/companyMediaHandler';
+import { fetchUserName } from '@/middlewares/fetchUserName';
 
 export class CompanyRouter {
   private router: Router;
@@ -19,23 +20,46 @@ export class CompanyRouter {
     this.router.post(
       '/',
       verifyToken,
+      fetchUserName,
       logoBannerUploader,
-      this.companyController.createCompany.bind(this.companyController)
-    );  
-  
+      handleCompanyMedia,
+      this.companyController.createCompany.bind(this.companyController),
+    );
+
     this.router.put(
       '/:id',
       logoBannerUploader,
-      this.companyController.updateCompany.bind(this.companyController)
+      fetchUserName,
+      handleCompanyMedia,
+      this.companyController.updateCompany.bind(this.companyController),
     );
-  
-    this.router.get('/search', verifyToken, this.companyController.getCompanies.bind(this.companyController));
-    this.router.get('/user', verifyToken, this.companyController.getUserCompany.bind(this.companyController));
-    this.router.get('/:id', this.companyController.getCompanyById.bind(this.companyController));
-   
-    this.router.get('/', this.companyController.getAllCompanies.bind(this.companyController));
-  
-    this.router.delete('/:id', verifyToken, checkAdminDev, this.companyController.deleteCompany.bind(this.companyController));
+
+    this.router.get(
+      '/search',
+      verifyToken,
+      this.companyController.getCompanies.bind(this.companyController),
+    );
+    this.router.get(
+      '/user',
+      verifyToken,
+      this.companyController.getUserCompany.bind(this.companyController),
+    );
+    this.router.get(
+      '/:id',
+      this.companyController.getCompanyById.bind(this.companyController),
+    );
+
+    this.router.get(
+      '/',
+      this.companyController.getAllCompanies.bind(this.companyController),
+    );
+
+    this.router.delete(
+      '/:id',
+      verifyToken,
+      checkAdminDev,
+      this.companyController.deleteCompany.bind(this.companyController),
+    );
   }
 
   getRouter(): Router {

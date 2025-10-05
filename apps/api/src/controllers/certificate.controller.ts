@@ -1,29 +1,34 @@
-import { PrismaClient } from '@prisma/client';
 import { Request, Response } from 'express';
-import { certificatePDF } from '@/utils/pdfCertificate';
+import { certificatePDF } from '@/utils/pdfCertificate'; // Correct import
 import QRCode from 'qrcode';
+import prisma from '@/prisma';
+
+interface AuthRequest extends Request {
+  user?: {
+    user_id: string;
+    role: string;
+    company_id?: string;
+  };
+}
 
 export class CertificateController {
-  private prisma: PrismaClient;
-
-  constructor() {
-    this.prisma = new PrismaClient();
-  }
-
-  public async generateCertificate(req: Request, res: Response): Promise<void> {
+  public async generateCertificate(req: AuthRequest, res: Response): Promise<void> {
     try {
       const { user_id } = req.user || {};
       const { score_id } = req.params;
 
-      const parsedScoreId = parseInt(score_id, 10);
-      if (isNaN(parsedScoreId)) {
+      if (!score_id) {
         res.status(400).json({ message: 'Invalid score_id provided.' });
         return;
       }
+      if (!user_id) {
+         res.status(401).json({ message: 'Unauthorized. User ID is missing.' });
+         return;
+      }
 
       const userAssessmentScore =
-        await this.prisma.userAssessmentScore.findFirst({
-          where: { score_id: parsedScoreId, user_id, status: 'passed' },
+        await prisma.userAssessmentScore.findFirst({
+          where: { score_id, user_id, status: 'passed' },
           include: {
             user: true,
             skillAssessment: true,
@@ -36,7 +41,6 @@ export class CertificateController {
         });
         return;
       }
-
       if (userAssessmentScore.status !== 'passed') {
         res.status(400).json({
           message: 'Certificate can only be generated for passed assessments.',
@@ -45,26 +49,27 @@ export class CertificateController {
       }
 
       const qrCodeData = await QRCode.toDataURL(
-        `${process.env.URL_WEB!}/certificate-verify?code=${userAssessmentScore.unique_code}`,
+        `${process.env.BASE_FE_URL!}/certificate-verify?code=${userAssessmentScore.unique_code}`,
       );
+      
+      // ✅ FIX: Removed parseInt and pass the string ID directly
       await certificatePDF(res, {
-        score_id: userAssessmentScore.score_id,
+        score_id: userAssessmentScore.score_id, 
         assessment_data:
-          typeof userAssessmentScore.skillAssessment?.assessment_data ===
-          'string'
-            ? userAssessmentScore.skillAssessment?.assessment_data
-            : JSON.stringify(
-                userAssessmentScore.skillAssessment?.assessment_data,
-              ) || 'Assessment data not available',
+          userAssessmentScore.skillAssessment?.assessment_data?.toString() || 'Assessment data not available',
         score: userAssessmentScore.score!,
-        user_name: `${userAssessmentScore.user?.first_name || 'Unknown'} ${
-          userAssessmentScore.user?.last_name || 'User'
+        user_name: `${userAssessmentScore.user!.first_name || 'Unknown'} ${
+          userAssessmentScore.user!.last_name || 'User'
         }`,
         badge: userAssessmentScore.badge || 'No badge',
         qrCodeData,
       });
     } catch (error) {
-      res.status(500).json({ message: 'Internal server error', error });
+      console.error("Error generating certificate:", error);
+      res.status(500).json({ 
+        message: 'Internal server error', 
+        error: error instanceof Error ? error.message : error 
+      });
     }
   }
 
@@ -77,7 +82,7 @@ export class CertificateController {
         return;
       }
   
-      const userAssessmentScore = await this.prisma.userAssessmentScore.findUnique({
+      const userAssessmentScore = await prisma.userAssessmentScore.findUnique({
         where: { unique_code: code },
         include: {
           user: true,
@@ -99,9 +104,9 @@ export class CertificateController {
         message: 'Certificate is valid',
         certificate: {
           unique_code: userAssessmentScore.unique_code,
-          user_name: `${userAssessmentScore.user.first_name} ${userAssessmentScore.user.last_name}`,
+          user_name: `${userAssessmentScore.user!.first_name} ${userAssessmentScore.user!.last_name}`,
           assessment_name:
-            userAssessmentScore.skillAssessment?.assessment_data || "Unknown Assessment",
+            userAssessmentScore.skillAssessment?.assessment_data?.toString() || "Unknown Assessment",
           badge: userAssessmentScore.badge,
           score: userAssessmentScore.score,
           issued_at: userAssessmentScore.created_at,
@@ -114,5 +119,4 @@ export class CertificateController {
       });
     }
   }
-  
 }

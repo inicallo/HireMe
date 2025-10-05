@@ -11,11 +11,12 @@ import { ISubsType } from '@/types/substype';
 
 interface CardProps {
   plan: ISubsType;
-  onChange: (id: number, name: string, value: any) => void;
+  // ✅ CORRECTED: All 'id' parameters are now strings
+  onChange: (id: string, name: string, value: any) => void;
   isEditingAll: boolean;
-  onRecommend: (id: number) => void;
-  onDelete: (id: number) => void;
-  onToggleEdit: (id: number) => void;
+  onRecommend: (id: string) => void;
+  onDelete: (id: string) => void;
+  onToggleEdit: (id: string) => void;
 }
 
 const Card: React.FC<CardProps> = ({
@@ -24,61 +25,68 @@ const Card: React.FC<CardProps> = ({
   isEditingAll,
   onRecommend,
   onDelete,
-  onToggleEdit,
 }) => {
   const [isEditing, setIsEditing] = useState<boolean>(false);
-  const [localPlan, setLocalPlan] = useState<ISubsType>(plan); // Menyimpan perubahan sementara
+  const [localPlan, setLocalPlan] = useState<ISubsType>(plan);
 
-  // Inisialisasi state lokal ketika mode edit aktif
   useEffect(() => {
-    if (isEditing) {
-      setLocalPlan({ ...plan, features: plan.features }); // Inisialisasi features sebagai array kosong jika undefined
+    // Sync local state if the parent's global edit mode changes
+    if (isEditingAll) {
+      setIsEditing(true);
+    } else {
+      setIsEditing(false);
     }
-  }, [isEditing, plan]);
+    setLocalPlan(plan);
+  }, [isEditingAll, plan]);
 
-  // Fungsi untuk menangani perubahan input
   const handleInputChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
-    setLocalPlan({ ...localPlan, [e.target.name]: e.target.value }); // Perbarui localPlan
+    const { name, value } = e.target;
+    setLocalPlan({ ...localPlan, [name]: name === 'price' ? parseFloat(value) || 0 : value });
   };
 
-  // Fungsi untuk menangani perubahan fitur
   const handleFeatureChange = (index: number, value: string) => {
     const updatedFeatures = [...localPlan.features];
-    updatedFeatures[index] = value; // Perbarui fitur di indeks tertentu
+    updatedFeatures[index] = value;
     setLocalPlan({ ...localPlan, features: updatedFeatures });
   };
 
   const addFeature = () => {
-    const updatedFeatures = [...localPlan.features, ''];
-    setLocalPlan({ ...localPlan, features: updatedFeatures }); // Tambahkan fitur kosong
+    setLocalPlan((prev) => ({ ...prev, features: [...prev.features, ''] }));
   };
 
   const removeFeature = (index: number) => {
     const updatedFeatures = localPlan.features.filter((_, i) => i !== index);
-    setLocalPlan({ ...localPlan, features: updatedFeatures }); // Hapus fitur berdasarkan indeks
-  };
-
-  const handleCancelEdit = () => {
-    setLocalPlan(plan); // Kembalikan data lokal ke data asli
-    setIsEditing(false); // Keluar dari mode edit
+    setLocalPlan({ ...localPlan, features: updatedFeatures });
   };
 
   const handleSave = () => {
-    // Kirim data ke komponen induk hanya setelah tombol Save ditekan
-    onChange(plan.subs_type_id, 'type', localPlan.type);
-    onChange(plan.subs_type_id, 'description', localPlan.description);
-    onChange(plan.subs_type_id, 'price', localPlan.price);
-    onChange(plan.subs_type_id, 'features', localPlan.features);
+    // Call onChange for each field that has changed to update the parent state
+    (Object.keys(localPlan) as Array<keyof ISubsType>).forEach(key => {
+      // Use a deep comparison for features array
+      if (key === 'features') {
+        if (JSON.stringify(localPlan[key]) !== JSON.stringify(plan[key])) {
+          onChange(plan.subs_type_id, key, localPlan[key]);
+        }
+      } else {
+        if (localPlan[key] !== plan[key]) {
+          onChange(plan.subs_type_id, key, localPlan[key]);
+        }
+      }
+    });
+    setIsEditing(false);
+  };
 
+  const handleCancelEdit = () => {
+    setLocalPlan(plan);
     setIsEditing(false);
   };
 
   const handleDelete = () => {
     onDelete(plan.subs_type_id);
   };
-
+  
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('id-ID', {
       style: 'currency',
@@ -99,9 +107,9 @@ const Card: React.FC<CardProps> = ({
         <button
           onClick={() => {
             if (isEditing) {
-              handleSave(); // Simpan perubahan saat tombol dalam mode Save
+              handleSave();
             } else {
-              setIsEditing(true); // Aktifkan mode Edit
+              setIsEditing(true);
             }
           }}
           className="absolute top-0 left-0 bg-gray-200 text-gray-700 text-xs md:text-sm font-semibold px-2 md:px-3 py-1 rounded-br-lg flex items-center space-x-1"
@@ -111,34 +119,29 @@ const Card: React.FC<CardProps> = ({
         </button>
       )}
 
-      <div className="flex-grow">
+      <div className="flex-grow pt-8">
         {isEditing ? (
           <>
-            {/* Input untuk title */}
             <input
               type="text"
               name="type"
-              value={localPlan.type || ''} // Gunakan nilai kosong jika tidak ada
+              value={localPlan.type || ''}
               onChange={handleInputChange}
               className="text-md md:text-lg font-semibold mb-2 w-full border-b-2 border-gray-200 focus:outline-none focus:border-blue-500"
               placeholder="Enter title"
             />
-
-            {/* Input untuk description */}
             <textarea
               name="description"
-              value={localPlan.description || ''} // Gunakan nilai kosong jika tidak ada
+              value={localPlan.description || ''}
               onChange={handleInputChange}
               className="text-sm md:text-gray-500 mb-4 w-full border-b-2 border-gray-200 focus:outline-none focus:border-blue-500"
               placeholder="Enter description"
             />
-
-            {/* Input untuk price */}
             <div className="text-2xl md:text-3xl font-bold text-blue-500 mb-1">
               <input
                 type="number"
                 name="price"
-                value={localPlan.price || 0} // Gunakan 0 jika tidak ada nilai
+                value={localPlan.price || 0}
                 onChange={handleInputChange}
                 className="w-full border-b-2 border-gray-200 focus:outline-none focus:border-blue-500"
                 placeholder="Enter price"
@@ -147,22 +150,15 @@ const Card: React.FC<CardProps> = ({
           </>
         ) : (
           <>
-            {/* Menampilkan title */}
             <h2 className="text-md md:text-lg font-semibold mb-2">
-              {localPlan.type || 'No title available'}{' '}
-              {/* Default jika title kosong */}
+              {plan.type || 'No title available'}
             </h2>
-
-            {/* Menampilkan description */}
             <p className="text-sm md:text-gray-500 mb-4">
-              {localPlan.description || 'No description available'}{' '}
-              {/* Default jika description kosong */}
+              {plan.description || 'No description available'}
             </p>
-
-            {/* Menampilkan price */}
             <div className="text-2xl md:text-3xl font-bold text-blue-500 mb-1">
-              {localPlan.price > 0
-                ? formatCurrency(localPlan.price) // Format harga jika > 0
+              {plan.price > 0
+                ? formatCurrency(plan.price)
                 : '0'}{' '}
               <span className="text-gray-500 text-sm md:text-lg font-normal">
                 /Monthly
@@ -171,47 +167,30 @@ const Card: React.FC<CardProps> = ({
           </>
         )}
         <ul className="space-y-2 mb-4 md:mb-6 mt-3 md:mt-4">
-          {localPlan.features && localPlan.features.length > 0 ? (
-            localPlan.features.map((feature, index) => (
-              <li
-                key={index}
-                className="flex items-center text-sm md:text-gray-500"
-              >
-                <FaCheckCircle className="text-blue-500 mr-2" />
-                {isEditing ? (
-                  <>
-                    <input
-                      type="text"
-                      value={feature}
-                      onChange={(e) =>
-                        handleFeatureChange(index, e.target.value)
-                      }
-                      className="w-full border-b-2 border-gray-200 focus:outline-none focus:border-blue-500"
-                    />
-                    <button
-                      onClick={() => removeFeature(index)}
-                      className="ml-2 text-red-500"
-                    >
-                      <FaTrashAlt />
-                    </button>
-                  </>
-                ) : (
+          {isEditing
+            ? localPlan.features?.map((feature, index) => (
+                <li key={index} className="flex items-center text-sm md:text-gray-500">
+                  <FaCheckCircle className="text-blue-500 mr-2" />
+                  <input
+                    type="text"
+                    value={feature}
+                    onChange={(e) => handleFeatureChange(index, e.target.value)}
+                    className="w-full border-b-2 border-gray-200 focus:outline-none focus:border-blue-500"
+                  />
+                  <button onClick={() => removeFeature(index)} className="ml-2 text-red-500">
+                    <FaTrashAlt />
+                  </button>
+                </li>
+              ))
+            : plan.features?.map((feature, index) => (
+                <li key={index} className="flex items-center text-sm md:text-gray-500">
+                  <FaCheckCircle className="text-blue-500 mr-2" />
                   <div className="my-1">{feature}</div>
-                )}
-              </li>
-            ))
-          ) : (
-            // Jika features tidak ada atau kosong, tampilkan label default
-            <li className="text-sm md:text-gray-500 italic text-center">
-              No features available
-            </li>
-          )}
+                </li>
+              ))}
           {isEditing && (
             <li>
-              <button
-                onClick={addFeature}
-                className="text-blue-500 flex items-center"
-              >
+              <button onClick={addFeature} className="text-blue-500 flex items-center">
                 <FaPlusCircle className="mr-2" /> Add Feature
               </button>
             </li>

@@ -1,5 +1,5 @@
 export interface ISubsType {
-    subs_type_id: number;  // Use the same name as in the database
+    subs_type_id: string;
     type: string;
     description: string;
     price: number;

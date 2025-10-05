@@ -56,7 +56,6 @@ const CreateAccount: React.FC = () => {
               <option value="">Select Category</option>
               <option value="candidate">Candidate</option>
               <option value="admin">Employers</option>
-              <option value="developer">Developer</option>
             </select>
           </div>
 

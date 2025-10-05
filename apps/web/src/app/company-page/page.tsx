@@ -46,23 +46,15 @@ export default function CompanyPage() {
   );
 
   useEffect(() => {
-    if (location) {
-      loadCompanies({ search: '' });
-    } else {
-      loadCompanies();
-    }
-  }, [sortOrder, location, loadCompanies]);
+    loadCompanies({ search: '' });
+  }, [sortOrder, loadCompanies]);
 
   const handleSearch = (filters: {
     search: string;
     industry?: string[];
     country?: string;
   }) => {
-    if (location) {
-      loadCompanies(filters);
-    } else {
-      loadCompanies(filters);
-    }
+    loadCompanies(filters);
   };
 
   const indexOfLastCompany = currentPage * companiesPerPage;

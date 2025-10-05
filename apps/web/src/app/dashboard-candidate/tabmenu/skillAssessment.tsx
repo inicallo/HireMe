@@ -76,12 +76,12 @@ const UserAssessment: React.FC = () => {
 
       toast.warn('Time is up! Auto-submitting the assessment.');
 
-      const data = { responses: [], token }; // Submit token with empty data
+      const data = { responses: [], token };
       await fetchSubmitAssessment(data);
 
       toast.success('Assessment auto-submitted successfully.');
-      setQuestions(null); // Reset questions in state
-      router.push('/dashboard-candidate'); // Navigate to results or dashboard page
+      setQuestions(null);
+      router.push('/dashboard-candidate');
     } catch (error: any) {
       console.error('Error auto-submitting assessment:', error);
       toast.error(error.message || 'Failed to auto-submit assessment.');
@@ -119,14 +119,15 @@ const UserAssessment: React.FC = () => {
     }
   };
 
-  const handleStartAssessment = async (assessmentId: number) => {
+  // ✅ CORRECTED: Changed assessmentId to string
+  const handleStartAssessment = async (assessmentId: string) => {
     try {
       setLoading(true);
       const { token, assessment } = await fetchStartAssessment(assessmentId);
 
-      localStorage.setItem('assessmentToken', token); // Save token
-      setQuestions(assessment.questions); // Save questions
-      setTimeLeft(30 * 60); // Reset timer
+      localStorage.setItem('assessmentToken', token);
+      setQuestions(assessment.questions);
+      setTimeLeft(30 * 60);
 
       toast.success('Assessment started!');
     } catch (error: any) {
@@ -137,17 +138,18 @@ const UserAssessment: React.FC = () => {
     }
   };
 
+  // ✅ CORRECTED: Changed question_id to string
   const handleSubmitAssessment = async (
-    responses: { question_id: number; answer_text: string }[],
+    responses: { question_id: string; answer_id: string; answer_text: string }[],
   ) => {
     try {
       setLoading(true);
       const token = localStorage.getItem('assessmentToken');
-      const data = { responses, token }; // Submit token with data
+      const data = { responses, token };
       await fetchSubmitAssessment(data);
-      setQuestions(null); // Reset questions after submit
+      setQuestions(null);
       toast.success('Assessment submitted successfully!');
-      router.push('/dashboard-candidate'); // Navigate to main page
+      router.push('/dashboard-candidate');
     } catch (error: any) {
       console.error('Error submitting assessment:', error);
       toast.error(error.message || 'Failed to submit assessment');
@@ -168,12 +170,12 @@ const UserAssessment: React.FC = () => {
     }
   };
 
-  const handleGenerateCertificate = async (score_id: number) => {
+  // ✅ CORRECTED: Changed score_id to string
+  const handleGenerateCertificate = async (score_id: string) => {
     try {
       const certificateBlob = await fetchGenerateCertificate(score_id);
       const url = window.URL.createObjectURL(certificateBlob);
 
-      // Unduh file sertifikat
       const a = document.createElement('a');
       a.href = url;
       a.download = `certificate_${score_id}.pdf`;
@@ -189,9 +191,9 @@ const UserAssessment: React.FC = () => {
 
   if (isActiveSubscription === null) {
     return (
-      <div className="flex justify-center">
+      <div className="flex justify-center items-center h-screen">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-blue-500"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
           <p className="mt-4 text-gray-600 font-semibold">
             Checking subscription status...
           </p>
@@ -232,22 +234,16 @@ const UserAssessment: React.FC = () => {
               <p>No assessments available at the moment.</p>
             </div>
           )}
-          <div className="p-6 max-w-4xl mx-auto">
+          <div className="mt-10">
             <h2 className="text-xl font-semibold mb-4 text-gray-800">
-              User Scores
+              Your Scores
             </h2>
             {userScores.length > 0 ? (
               userScores.map((score) => (
                 <ScoreCard
                   key={score.score_id}
-                  badge={score.badge}
-                  score={score.score}
-                  status={score.status}
-                  unique_code={score.unique_code}
-                  created_at={score.created_at}
-                  assessment_data={score.assessment_data}
-                  score_id={score.score_id} // Berikan score_id
-                  onGenerateCertificate={handleGenerateCertificate} // Fungsi menerima score_id
+                  score={score}
+                  onGenerateCertificate={handleGenerateCertificate}
                 />
               ))
             ) : (

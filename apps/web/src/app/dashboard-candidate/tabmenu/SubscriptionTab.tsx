@@ -106,7 +106,7 @@ const CustomerPlans: React.FC = () => {
   
     try {
       const result = await uploadPaymentProof({
-        subs_type_id: selectedPlan.subs_type_id,
+        subs_type_id: parseInt(selectedPlan.subs_type_id),
         payment_proof: selectedFile,
       });
   
