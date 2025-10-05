@@ -1,4 +1,4 @@
-import prisma from '@/prisma';
+import prisma from '../prisma';
 import { Request, Response } from 'express';
 
 export class SubsController {
@@ -16,10 +16,10 @@ export class SubsController {
         data: {
           type,
           description,
-          price: parseFloat(price), // ✅ ENSURE price is a number
+          price: parseFloat(price),
           features,
           is_recomend: is_recomend || false,
-          User_id: userId, // ✅ USE consistent snake_case
+          User_id: userId,
         },
       });
       res.status(201).send({
