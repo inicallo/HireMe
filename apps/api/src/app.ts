@@ -25,7 +25,7 @@ import { PlanBillRouter } from './routers/userplan.router';
 import { AssessmentRouter } from './routers/assessment.router';
 import { CertificateRouter } from './routers/certificate.router';
 import { PreSelectionTestRouter } from './routers/preselection.router';
-export default class App {
+export class App {
   private app: Express;
 
   constructor() {
