@@ -7,7 +7,9 @@
   "scripts": {
     "dev": "cross-env NODE_ENV=development ts-node-dev -r tsconfig-paths/register src/index.ts",
     "build": "prisma generate && tsc",
-    "serve": "cross-env NODE_ENV=production node dist/index.js",
+    "start": "node src/index.ts",
+    "vercel-build": "node src/index.ts",
+    "serve": "cross-env NODE_ENV=production node index.ts",
     "test": "echo \"Error: no test specified\" && exit 1",
     "prisma": "npx prisma",
     "lint": "eslint ."

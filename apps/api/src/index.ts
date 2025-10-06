@@ -1,10 +1,11 @@
 import App from './app';
+import { connectDB } from './utils/connectDB';
 
-// Instantiate the App class to configure Express
-const app = new App();
+const main = async () => {
+  await connectDB(); 
 
-// Get the configured Express instance
-const expressApp = app.getApp();
+  const app = new App();
+  app.start();
+};
 
-// Export the instance for Vercel to use
-module.exports = expressApp;
+main();
