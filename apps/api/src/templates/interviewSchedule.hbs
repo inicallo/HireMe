@@ -1,7 +1,74 @@
-<p>Dear {{name}},</p>
-<p>Your interview for the position of {{jobTitle}} has been scheduled as follows:</p>
-<ul>
-  <li><strong>Date:</strong> {{interviewDate}}</li>
-  <li><strong>Time:</strong> {{interviewTime}}</li>
-</ul>
-<p>Thank you!</p>
+<html lang='en'>
+  <head>
+    <meta charset='UTF-8' />
+    <meta http-equiv='X-UA-Compatible' content='IE=edge' />
+    <meta name='viewport' content='width=device-width, initial-scale=1.0' />
+    <title>Interview Scheduled</title>
+    <style>
+      body { font-family: 'Arial', sans-serif; background-color: #f7f8fa;
+      margin: 0; padding: 0; display: flex; justify-content: center;
+      align-items: center; min-height: 100vh; } .email-container {
+      background-color: #ffffff; border-radius: 8px; box-shadow: 0 4px 8px
+      rgba(0, 0, 0, 0.1); max-width: 500px; padding: 20px; text-align: center; }
+      h2 { color: #2d3748; font-size: 24px; margin-bottom: 16px; } p { color:
+      #4a5568; font-size: 16px; margin-bottom: 24px; } .schedule-box {
+      background-color: #e6f0ff; border-left: 5px solid #007bff; padding: 15px;
+      margin: 20px 0; text-align: left; border-radius: 4px; } .schedule-box
+      strong { display: block; margin-bottom: 5px; color: #2d3748; } .btn {
+      background-color: #007bff; color: #ffffff; padding: 14px 28px;
+      border-radius: 30px; font-size: 18px; font-weight: 600; display:
+      inline-block; text-align: center; text-decoration: none; transition:
+      background-color 0.3s ease, box-shadow 0.3s ease; box-shadow: 0 4px 8px
+      rgba(0, 123, 255, 0.4); border: none; cursor: pointer; margin-bottom:
+      10px; width: 80%; max-width: 300px; } .btn:hover { background-color:
+      #0056b3; } .footer { margin-top: 40px; font-size: 12px; color: #a0aec0; }
+    </style>
+  </head>
+  <body>
+    <div class='email-container'>
+      <h2>Interview Scheduled! 📅</h2>
+      <p>Hello {{name}},</p>
+      <p>We are pleased to inform you that your interview for the position of
+        <strong>{{jobTitle}}</strong>
+        at
+        <strong>{{companyName}}</strong>
+        has been successfully scheduled.</p>
+
+      <div class='schedule-box'>
+        <p
+          style='margin-bottom: 10px; color: #007bff; font-weight: bold; text-align: center;'
+        >Interview Details:</p>
+        <p style='margin: 0; text-align: center;'>
+          <strong>Position:</strong>
+          {{jobTitle}}
+          <br />
+          <strong>Company:</strong>
+          {{companyName}}
+          <br />
+          <strong>Date:</strong>
+          <strong>{{interviewDate}}</strong>
+          <br />
+          <strong>Time:</strong>
+          <strong>{{interviewTime}}</strong>
+        </p>
+      </div>
+
+      <p>Please log in to your account to view the full details, including the
+        meeting link and interviewer information.</p>
+
+      <a href='{{base_fe_url}}/sign-in' target='_blank' class='btn'>View Full
+        Interview Details</a>
+
+      <div class='footer'>
+        <p style='margin-bottom: 8px;'>Please ensure you are ready a few minutes
+          before the scheduled time.</p>
+        <p style='margin: 0;'>If you need assistance, please visit our
+          <a
+            href='{{base_fe_url}}/'
+            style='color: #007bff; text-decoration: none;'
+          >Contact Center</a>.
+        </p>
+      </div>
+    </div>
+  </body>
+</html>

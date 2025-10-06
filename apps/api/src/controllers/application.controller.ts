@@ -432,6 +432,7 @@ export class ApplicationController {
         companyName: application.job.company?.company_name || 'the company',
         interviewDate: new Date(interviewDate).toLocaleDateString(),
         interviewTime: new Date(interviewTime).toLocaleTimeString(),
+        base_fe_url: base_fe_url,
       });
 
       await transporter.sendMail({

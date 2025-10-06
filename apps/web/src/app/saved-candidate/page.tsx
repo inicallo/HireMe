@@ -55,8 +55,8 @@ const SchedulePage: React.FC = () => {
         const data = await response.json();
 
         if (response.ok && data.company) {
-          setCompanyId(data.company.company_id); // Simpan company_id
-          setCompany({ name: data.company.company_name }); // Simpan nama perusahaan
+          setCompanyId(data.company.company_id);
+          setCompany({ name: data.company.company_name });
         } else {
           throw new Error('Failed to fetch company data');
         }
