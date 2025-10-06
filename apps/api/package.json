@@ -3,13 +3,12 @@
   "version": "1.0.0",
   "description": "",
   "type": "commonjs",
-  "main": "src/index.ts",
+  "main": "dist/index.js",
   "scripts": {
     "dev": "cross-env NODE_ENV=development ts-node-dev -r tsconfig-paths/register src/index.ts",
     "build": "prisma generate && tsc",
-    "start": "node src/index.ts",
-    "vercel-build": "node src/index.ts",
-    "serve": "cross-env NODE_ENV=production node index.ts",
+    "start": "cross-env NODE_ENV=production node dist/index.js",
+    "serve": "cross-env NODE_ENV=production node dist/index.js",
     "test": "echo \"Error: no test specified\" && exit 1",
     "prisma": "npx prisma",
     "lint": "eslint ."

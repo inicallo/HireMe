@@ -1,11 +1,11 @@
 import App from './app';
 import { connectDB } from './utils/connectDB';
 
-const main = async () => {
-  await connectDB(); 
+// Establish database connection
+connectDB();
 
-  const app = new App();
-  app.start();
-};
+// Create an instance of the app
+const app = new App();
 
-main();
+// Export the Express app for Vercel
+export default app.getApp();

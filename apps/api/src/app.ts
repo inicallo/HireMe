@@ -19,7 +19,7 @@ import { ApplicationRouter } from './routers/application.router';
 import { FavoriteJobRouter } from './routers/favoriteJob.router';
 import { CompanyRouter } from './routers/company.router';
 import { AnalyticsRouter } from './routers/analytic.router';
-import { base_fe_url } from './controllers/user.controller';
+import { BASE_FE_URL } from './config';
 import { CvRouter } from './routers/cv.router';
 import { PlanBillRouter } from './routers/userplan.router';
 import { AssessmentRouter } from './routers/assessment.router';
@@ -36,7 +36,7 @@ export default class App {
   }
 
   private configure(): void {
-    this.app.use(cors({ origin: `${base_fe_url}`, credentials: true }));
+    this.app.use(cors({ origin: `${BASE_FE_URL}`, credentials: true }));
     this.app.use(json());
     this.app.use(urlencoded({ extended: true }));
   }
