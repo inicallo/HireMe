@@ -54,10 +54,12 @@ const Testimonial = () => {
         <h2 className="text-3xl font-bold mb-8">Clients Testimonial</h2>
 
         <div className="relative">
-          {/* Previous Button */}
+          {/* Previous Button (FIXED: Hidden on mobile, positioned outside on LG) */}
           <button
             onClick={prevTestimonial}
-            className="absolute z-50 top-1/2 -left-16 transform -translate-y-1/2 bg-white shadow-md w-12 h-12 sm:w-14 sm:h-14 rounded-lg hover:bg-blue-100 transition flex items-center justify-center"
+            className="absolute z-50 top-1/2 transform -translate-y-1/2 bg-white shadow-md w-12 h-12 sm:w-14 sm:h-14 rounded-lg hover:bg-blue-100 transition flex items-center justify-center 
+            // 👇 Only show on screens larger than LG, and apply the fixed margin
+            hidden lg:flex -left-16" 
           >
             <FaChevronLeft className="text-blue-500 text-xl" />
           </button>
@@ -98,13 +100,31 @@ const Testimonial = () => {
               })}
           </div>
 
-          {/* Next Button */}
+          {/* Next Button (FIXED: Hidden on mobile, positioned outside on LG) */}
           <button
             onClick={nextTestimonial}
-            className="absolute z-50 top-1/2 -right-16 transform -translate-y-1/2 bg-white shadow-md w-12 h-12 sm:w-14 sm:h-14 rounded-lg hover:bg-blue-100 transition flex items-center justify-center"
+            className="absolute z-50 top-1/2 transform -translate-y-1/2 bg-white shadow-md w-12 h-12 sm:w-14 sm:h-14 rounded-lg hover:bg-blue-100 transition flex items-center justify-center
+            // 👇 Only show on screens larger than LG, and apply the fixed margin
+            hidden lg:flex -right-16" 
           >
             <FaChevronRight className="text-blue-500 text-xl" />
           </button>
+
+          {/* 👇 NEW MOBILE NAVIGATION (Visible only on small screens) */}
+          <div className="mt-8 flex justify-center lg:hidden space-x-4">
+              <button
+                  onClick={prevTestimonial}
+                  className="bg-white shadow-md w-12 h-12 rounded-lg hover:bg-blue-100 transition flex items-center justify-center"
+              >
+                  <FaChevronLeft className="text-blue-500 text-xl" />
+              </button>
+              <button
+                  onClick={nextTestimonial}
+                  className="bg-white shadow-md w-12 h-12 rounded-lg hover:bg-blue-100 transition flex items-center justify-center"
+              >
+                  <FaChevronRight className="text-blue-500 text-xl" />
+              </button>
+          </div>
         </div>
       </div>
     </div>
