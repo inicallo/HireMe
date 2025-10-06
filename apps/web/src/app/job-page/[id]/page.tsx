@@ -9,7 +9,6 @@ import JobOverview from './JobOverview';
 import CompanyInfo from './CompanyInfo';
 import ApplyModal from './ApplyModal';
 import { useRouter } from 'next/navigation';
-import ProtectedRoute from '@/components/ProtectedRoute';
 import ShareButton from '@/components/share/ShareButton';
 
 const JobPage = () => {
@@ -72,55 +71,53 @@ const JobPage = () => {
   };
 
   return (
-    <ProtectedRoute requiredRole="candidate">
-      <div className="flex flex-col items-center w-full min-h-screen bg-gray-100 p-4 md:p-6 lg:p-8 pt-24 md:mt-16 lg:mt-0">
-        <div className="max-w-6xl w-full">
-          {/* Main Layout for Job and Sidebar */}
-          <div className="flex flex-col lg:flex-row gap-8">
-            {/* Main Job Details Section */}
-            <div className="flex-1 bg-white shadow-lg rounded-lg p-4 md:p-6 lg:p-8 space-y-8">
-              <HeaderSection
-                job={job}
-                isSaved={isSaved}
-                handleSaveClick={handleSaveClick}
-                hasApplied={hasApplied}
-              />
+    <div className="flex flex-col items-center w-full min-h-screen bg-gray-100 p-4 md:p-6 lg:p-8 pt-24 md:mt-16 lg:mt-0">
+      <div className="max-w-6xl w-full">
+        {/* Main Layout for Job and Sidebar */}
+        <div className="flex flex-col lg:flex-row gap-8">
+          {/* Main Job Details Section */}
+          <div className="flex-1 bg-white shadow-lg rounded-lg p-4 md:p-6 lg:p-8 space-y-8">
+            <HeaderSection
+              job={job}
+              isSaved={isSaved}
+              handleSaveClick={handleSaveClick}
+              hasApplied={hasApplied}
+            />
 
-              {/* --- STYLING UPDATE: Job Description Section --- */}
-              <section>
-                <h2 className="text-xl md:text-2xl font-bold text-gray-800 mb-4 border-b pb-2">
-                  Job Description
-                </h2>
-                <div className="prose prose-sm md:prose-base max-w-none text-gray-700">
-                  {renderFormattedText(job.description)}
-                </div>
-              </section>
+            {/* --- STYLING UPDATE: Job Description Section --- */}
+            <section>
+              <h2 className="text-xl md:text-2xl font-bold text-gray-800 mb-4 border-b pb-2">
+                Job Description
+              </h2>
+              <div className="prose prose-sm md:prose-base max-w-none text-gray-700">
+                {renderFormattedText(job.description)}
+              </div>
+            </section>
 
-              {/* --- STYLING UPDATE: Responsibilities Section --- */}
-              <section>
-                <h2 className="text-xl md:text-2xl font-bold text-gray-800 mb-4 border-b pb-2">
-                  Responsibilities
-                </h2>
-                <div className="prose prose-sm md:prose-base max-w-none text-gray-700">
-                  {renderFormattedText(job.responsibility)}
-                </div>
-              </section>
+            {/* --- STYLING UPDATE: Responsibilities Section --- */}
+            <section>
+              <h2 className="text-xl md:text-2xl font-bold text-gray-800 mb-4 border-b pb-2">
+                Responsibilities
+              </h2>
+              <div className="prose prose-sm md:prose-base max-w-none text-gray-700">
+                {renderFormattedText(job.responsibility)}
+              </div>
+            </section>
 
-              <ShareButton id={job.job_id} />
-            </div>
+            <ShareButton id={job.job_id} />
+          </div>
 
-            {/* Sidebar Section */}
-            <div className="w-full lg:w-1/3 space-y-6">
-              <JobOverview job={job} />
-              <CompanyInfo job={job} />
-            </div>
+          {/* Sidebar Section */}
+          <div className="w-full lg:w-1/3 space-y-6">
+            <JobOverview job={job} />
+            <CompanyInfo job={job} />
           </div>
         </div>
-
-        {/* Apply Modal Component */}
-        {job && <ApplyModal jobId={job.job_id} hasApplied={hasApplied} />}
       </div>
-    </ProtectedRoute>
+
+      {/* Apply Modal Component */}
+      {job && <ApplyModal jobId={job.job_id} hasApplied={hasApplied} />}
+    </div>
   );
 };
 
