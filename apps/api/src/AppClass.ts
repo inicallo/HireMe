@@ -1,3 +1,5 @@
+// apps/api/src/AppClass.ts
+
 import express, {
   json,
   urlencoded,
@@ -25,6 +27,8 @@ import { PlanBillRouter } from './routers/userplan.router';
 import { AssessmentRouter } from './routers/assessment.router';
 import { CertificateRouter } from './routers/certificate.router';
 import { PreSelectionTestRouter } from './routers/preselection.router';
+
+// The class definition is correct: no 'export' keyword
 class App {
   private app: Express;
 
@@ -107,14 +111,7 @@ class App {
   public getApp(): express.Application {
     return this.app;
   }
-
-  // public start(): void {
-  //   this.app.listen(PORT, () => {
-  //     console.log(`  ➜  [API] Local:   http://localhost:${PORT}/api`);
-  //   });
-  // }
 }
 
-module.exports = {
-    App,
-};
+// 👇 The simplest, cleanest CommonJS export for the Vercel runtime
+module.exports = App;
