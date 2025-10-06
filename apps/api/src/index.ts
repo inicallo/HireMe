@@ -1,7 +1,7 @@
-import { App } from './app';
-import { connectDB } from './utils/connectDB';
+const { App } = require('./app');
+const { connectDB } = require('./utils/connectDB');
 
 connectDB();
-const app = new App();
 
+const app = new App();
 module.exports = app.getApp();

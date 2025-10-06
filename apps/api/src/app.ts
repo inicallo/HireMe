@@ -25,7 +25,7 @@ import { PlanBillRouter } from './routers/userplan.router';
 import { AssessmentRouter } from './routers/assessment.router';
 import { CertificateRouter } from './routers/certificate.router';
 import { PreSelectionTestRouter } from './routers/preselection.router';
-export class App {
+export default class App {
   private app: Express;
 
   constructor() {
@@ -104,13 +104,13 @@ export class App {
     this.app.use('/api/analytics', analyticsRouter.getRouter());
   }
 
-  public getApp(): Express {
+  public getApp(): express.Application {
     return this.app;
   }
 
-  public start(): void {
-    this.app.listen(PORT, () => {
-      console.log(`  ➜  [API] Local:   http://localhost:${PORT}/api`);
-    });
-  }
+  // public start(): void {
+  //   this.app.listen(PORT, () => {
+  //     console.log(`  ➜  [API] Local:   http://localhost:${PORT}/api`);
+  //   });
+  // }
 }
