@@ -54,7 +54,6 @@ const CompanyPage = () => {
   if (!company) return <p className="text-center">No company data available</p>;
 
   return (
-    <ProtectedRoute requiredRole="candidate">
       <div className="relative flex flex-col items-center w-full min-h-screen bg-gray-100">
         {/* Banner Section */}
         <div
@@ -118,7 +117,6 @@ const CompanyPage = () => {
           <ReviewsPage params={{ companyId: company.company_id }} />
         </div>
       </div>
-    </ProtectedRoute>
   );
 };
 

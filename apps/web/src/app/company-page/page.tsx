@@ -76,7 +76,6 @@ export default function CompanyPage() {
 
   return (
     <div className="bg-[#F1F2F4]">
-      <ProtectedRoute requiredRole="candidate">
         <div className="container mx-auto py-8 px-4 sm:px-6 lg:px-8">
           <h1 className="text-2xl sm:text-3xl font-bold mb-6 text-center sm:text-left">
             Browse Companies
@@ -149,7 +148,6 @@ export default function CompanyPage() {
             </button>
           </div>
         </div>
-      </ProtectedRoute>
     </div>
   );
 }

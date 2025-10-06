@@ -22,8 +22,7 @@ export const Footer = () => {
               </Link>
             </p>
             <p className="text-sm">PT. HireMe Indonesia</p>
-            <p className="text-sm">
-              Lantai 30, Revenue Tower District 8 SCBD</p>
+            <p className="text-sm">Lantai 30, Revenue Tower District 8 SCBD</p>
           </div>
 
           {/* Quick Link section */}
@@ -133,26 +132,10 @@ export const Footer = () => {
                 target="_blank"
               >
                 Calvin Angelo
-              </Link>
-              ,{' '}
-              <Link
-                href="https://www.linkedin.com/in/muhammad-rezaldo-999642317/"
-                className="hover:text-white transition-colors"
-                target="_blank"
-              >
-                Muhammad Rezaldo
-              </Link>
-              ,{' '}
-              <Link
-                href="https://www.linkedin.com/in/naufalhh/"
-                className="hover:text-white transition-colors"
-                target="_blank"
-              >
-                Naufal Hesantra Harijadi
               </Link>{' '}
               (
               <Link
-                href="https://www.purwadhika.com/"
+                href="https://www.purwadhika.com/job-connector/fullstack-web-development"
                 className="hover:text-white transition-colors"
                 target="_blank"
               >
@@ -160,7 +143,6 @@ export const Footer = () => {
               </Link>
               )
             </p>
-
 
             {/* Social Media Icons */}
             <div className="flex justify-center md:justify-end space-x-4">

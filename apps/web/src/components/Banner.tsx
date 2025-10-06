@@ -51,8 +51,7 @@ const LandingPage = () => {
           setLatitude(position.coords.latitude);
           setLongitude(position.coords.longitude);
         },
-        () => {
-        },
+        () => {},
       );
     }
   }, []);
@@ -65,14 +64,13 @@ const LandingPage = () => {
           {/* Text Content */}
           <div className="text-center lg:text-left mb-8 lg:mb-0 lg:w-1/2">
             <h1 className="text-3xl sm:text-4xl lg:text-6xl font-bold mb-4">
-              Find a job that suits
-              <br className="hidden sm:block" />
+              Find a job that suits <br className="hidden sm:block" />{' '}
               your interest & skills.
             </h1>
             <p className="text-gray-600 mb-6 text-sm sm:text-base lg:text-lg">
               Explore endless opportunities and take the next step in your
               career.
-              <br className="hidden sm:block" />
+              <br className="hidden sm:block" />{' '}
               Discover jobs that align with your skills and passions.
             </p>
 
