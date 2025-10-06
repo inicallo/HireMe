@@ -5,7 +5,7 @@ import path from 'path';
 import fs from 'fs';
 import handlebars from 'handlebars';
 import { getFriendlyStatus } from '../utils/applicationStatusMapper';
-import { base_fe_url } from '../controllers/user.controller';
+import { BASE_FE_URL } from '../config';
 
 export async function sendNotification({
   userId,
@@ -40,7 +40,7 @@ export async function notifyApplicationStatusChange(
   userId: string,
   applicationId: string,
   currentStatus: string,
-  newStatus: string
+  newStatus: string,
 ) {
   const application = await prisma.application.findUnique({
     where: { application_id: applicationId },
@@ -68,7 +68,10 @@ export async function notifyApplicationStatusChange(
     link: `/applications/${applicationId}`,
   });
 
-  const templatePath = path.join(process.cwd(), 'src/templates/applicationStatusUpdate.hbs');
+  const templatePath = path.join(
+    __dirname,
+    '../templates/applicationStatusUpdate.hbs',
+  );
   const templateSource = fs.readFileSync(templatePath, 'utf-8');
   const compiledTemplate = handlebars.compile(templateSource);
 
@@ -78,7 +81,8 @@ export async function notifyApplicationStatusChange(
     companyName,
     currentStatus: friendlyCurrentStatus,
     newStatus: friendlyNewStatus,
-    loginLink: `${base_fe_url}/sign-in`,
+    loginLink: `${BASE_FE_URL}/sign-in`,
+    base_fe_url: BASE_FE_URL,
   });
 
   await transporter.sendMail({
@@ -93,7 +97,7 @@ export async function sendApplicationStatusNotification(
   // CORRECTED: Changed ID types to string
   userId: string,
   applicationId: string,
-  status: string
+  status: string,
 ) {
   const application = await prisma.application.findUnique({
     where: { application_id: applicationId },
@@ -120,7 +124,10 @@ export async function sendApplicationStatusNotification(
     link: `/applications/${applicationId}`,
   });
 
-  const templatePath = path.join(__dirname, '../templates/applicationStatusUpdate.hbs');
+  const templatePath = path.join(
+    __dirname,
+    '../templates/applicationStatusUpdate.hbs',
+  );
   const templateSource = fs.readFileSync(templatePath, 'utf-8');
   const compiledTemplate = handlebars.compile(templateSource);
 
@@ -129,7 +136,8 @@ export async function sendApplicationStatusNotification(
     jobTitle,
     companyName,
     newStatus: friendlyStatus,
-    loginLink: `${base_fe_url}/sign-in`,
+    loginLink: `${BASE_FE_URL}/sign-in`,
+    base_fe_url: BASE_FE_URL,
   });
 
   await transporter.sendMail({
@@ -144,7 +152,7 @@ export async function createInterviewNotification(
   // CORRECTED: Changed ID types to string
   interviewId: string,
   userId: string,
-  status: string
+  status: string,
 ) {
   const interview = await prisma.interview.findUnique({
     where: { interview_id: interviewId },
@@ -173,7 +181,10 @@ export async function createInterviewNotification(
     link: `/interviews/${interviewId}`,
   });
 
-  const templatePath = path.join(__dirname, '../templates/interviewStatusUpdate.hbs');
+  const templatePath = path.join(
+    __dirname,
+    '../templates/interviewStatusUpdate.hbs',
+  );
   const templateSource = fs.readFileSync(templatePath, 'utf-8');
   const compiledTemplate = handlebars.compile(templateSource);
 
@@ -182,7 +193,8 @@ export async function createInterviewNotification(
     jobTitle,
     companyName,
     interviewStatus: friendlyInterviewStatus,
-    loginLink: `${base_fe_url}/sign-in`,
+    loginLink: `${BASE_FE_URL}/sign-in`,
+    base_fe_url: BASE_FE_URL,
   });
 
   await transporter.sendMail({

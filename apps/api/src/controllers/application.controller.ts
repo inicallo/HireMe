@@ -80,6 +80,7 @@ export class ApplicationController {
         name: `${user.first_name} ${user.last_name}`,
         jobTitle: job.job_title,
         companyName: job.company?.company_name || 'the company',
+        base_fe_url: base_fe_url,
       });
 
       await transporter.sendMail({
@@ -138,80 +139,80 @@ export class ApplicationController {
     }
   }
 
-async updateApplicationStatus(req: Request, res: Response) {
-  try {
-    const { applicationId } = req.params;
-    const { status: newStatus } = req.body;
+  async updateApplicationStatus(req: Request, res: Response) {
+    try {
+      const { applicationId } = req.params;
+      const { status: newStatus } = req.body;
 
-    if (!applicationId || !newStatus) {
-      return res
-        .status(400)
-        .json({ msg: 'Application ID and new status are required' });
-    }
+      if (!applicationId || !newStatus) {
+        return res
+          .status(400)
+          .json({ msg: 'Application ID and new status are required' });
+      }
 
-    if (
-      !Object.values(ApplicationStatus).includes(
-        newStatus as ApplicationStatus,
-      )
-    ) {
-      return res.status(400).json({ msg: 'Invalid application status' });
-    }
+      if (
+        !Object.values(ApplicationStatus).includes(
+          newStatus as ApplicationStatus,
+        )
+      ) {
+        return res.status(400).json({ msg: 'Invalid application status' });
+      }
 
-    const currentApplication = await prisma.application.findUnique({
-      where: { application_id: applicationId },
-      include: {
-        job: {
-          select: {
-            company_id: true,
-          },
-        },
-      },
-    });
-
-    if (!currentApplication) {
-      return res.status(404).json({ msg: 'Application not found' });
-    }
-
-    const currentStatus = currentApplication.status;
-
-    const updatedApplication = await prisma.application.update({
-      where: { application_id: applicationId },
-      data: { status: newStatus as ApplicationStatus },
-    });
-
-    if (newStatus === 'hired' && currentApplication.job?.company_id) {
-      await prisma.company.update({
-        where: {
-          company_id: currentApplication.job.company_id,
-        },
-        data: {
-          users: {
-            connect: {
-              user_id: updatedApplication.user_id,
+      const currentApplication = await prisma.application.findUnique({
+        where: { application_id: applicationId },
+        include: {
+          job: {
+            select: {
+              company_id: true,
             },
           },
         },
       });
+
+      if (!currentApplication) {
+        return res.status(404).json({ msg: 'Application not found' });
+      }
+
+      const currentStatus = currentApplication.status;
+
+      const updatedApplication = await prisma.application.update({
+        where: { application_id: applicationId },
+        data: { status: newStatus as ApplicationStatus },
+      });
+
+      if (newStatus === 'hired' && currentApplication.job?.company_id) {
+        await prisma.company.update({
+          where: {
+            company_id: currentApplication.job.company_id,
+          },
+          data: {
+            users: {
+              connect: {
+                user_id: updatedApplication.user_id,
+              },
+            },
+          },
+        });
+      }
+
+      await notifyApplicationStatusChange(
+        updatedApplication.user_id,
+        updatedApplication.application_id,
+        currentStatus,
+        newStatus,
+      );
+
+      res.status(200).json({
+        msg: 'Application status updated successfully!',
+        application: updatedApplication,
+      });
+    } catch (error) {
+      const err = error as Error;
+      res
+        .status(500)
+        .json({ msg: 'Error updating application status', error: err.message });
     }
-
-    await notifyApplicationStatusChange(
-      updatedApplication.user_id,
-      updatedApplication.application_id,
-      currentStatus,
-      newStatus,
-    );
-
-    res.status(200).json({
-      msg: 'Application status updated successfully!',
-      application: updatedApplication,
-    });
-  } catch (error) {
-    const err = error as Error;
-    res
-      .status(500)
-      .json({ msg: 'Error updating application status', error: err.message });
   }
-}
 
   async getRecentlyAppliedJobs(req: Request, res: Response) {
     const userId = req.params.userId;
